@@ -1,12 +1,10 @@
 package com.mdeditor.sd;
 
-import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorState;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.UserDataHolder;
-import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.Nls;
@@ -16,20 +14,31 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
+import java.io.InputStream;
 
 
 public class MarkdownEditor implements FileEditor, UserDataHolder {
     private final VirtualFile file;
     private final Project project;
 
-    private final String cssPath;
+    private final String style;
 
     public MarkdownEditor(Project project, VirtualFile file) {
         this.file = file;
         this.project = project;
+        this.style = readCss();
+    }
 
+    private String readCss(){
+        InputStream cssStream = getClass().getClassLoader().getResourceAsStream("editor/markdown.css");
+        if(cssStream == null) return "";
 
-        cssPath = PathManager.getPluginsPath() + "/src/main/resources/editor/markdown.css";
+        try{
+            String cssContent = new String(cssStream.readAllBytes());
+            return Utils.wrapWithHtmlTag("style", cssContent);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -37,31 +46,23 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
      */
     @Override
     public @NotNull JComponent getComponent() {
-        try{
-            String content = VfsUtil.loadText(file);
-
-            JTextPane jTextPane = new JTextPane();
-            jTextPane.setContentType("text/html");
-            jTextPane.setEditable(true);
-
-
-            VirtualFile cssFile = LocalFileSystem.getInstance().findFileByPath(cssPath);
-            System.out.println(cssPath);
-
-            if (cssFile != null && cssFile.exists()) {
-                String cssContent = VfsUtil.loadText(cssFile);
-                System.out.println(cssContent);
-                String style = "<style>" + cssContent + "</style>";
-
-                jTextPane.setText("<html>" + style + "<center><u>Text</u></center>" + content + "</html>");
-            } else {
-                jTextPane.setText("<html><center><u>Text</u></center>" + content + "</html>");
-            }
-
-            return jTextPane;
+        String content = null;
+        try {
+            content = VfsUtil.loadText(file);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        JTextPane jTextPane = new JTextPane();
+        jTextPane.setContentType("text/html");
+        jTextPane.setEditable(true);
+        jTextPane.setText(makeHtmlWithCss("<center><u>Text</u></center>" + content));
+
+        return jTextPane;
+    }
+
+    private String makeHtmlWithCss(String html){
+        return Utils.wrapWithHtmlTag("html", style + html);
     }
 
     /**
