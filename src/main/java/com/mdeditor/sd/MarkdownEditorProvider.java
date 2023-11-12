@@ -55,7 +55,7 @@ public class MarkdownEditorProvider implements FileEditorProvider {
      * @see FileEditorPolicy#PLACE_BEFORE_DEFAULT_EDITOR
      * @see FileEditorPolicy#PLACE_AFTER_DEFAULT_EDITOR
      */
-    @Override~
+    @Override
     public @NotNull FileEditorPolicy getPolicy() {
         return FileEditorPolicy.PLACE_AFTER_DEFAULT_EDITOR;
     }
