@@ -1,6 +1,7 @@
 package com.mdeditor.sd;
 
 import com.intellij.openapi.fileEditor.FileEditor;
+import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.fileEditor.FileEditorState;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
@@ -27,6 +28,10 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
         this.file = file;
         this.project = project;
         this.style = readCss();
+
+        // Add a listener to detect file editor changes
+        FileEditorManagerListener listener = new MarkdownEditorManagerListener(project);
+        project.getMessageBus().connect().subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, listener);
     }
 
     private String readCss(){
