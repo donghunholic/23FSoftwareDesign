@@ -6,13 +6,14 @@ import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.intellij.ui.content.ContentManager;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 
 public class EditorToolWindowFactory implements ToolWindowFactory {
 
     @Override
-    public void createToolWindowContent(Project project, ToolWindow toolWindow) {
+    public void createToolWindowContent(@NotNull Project project, ToolWindow toolWindow) {
         ContentManager contentManager = toolWindow.getContentManager();
 
         // Create content for the first tab
@@ -25,8 +26,6 @@ public class EditorToolWindowFactory implements ToolWindowFactory {
         Content content2 = ContentFactory.getInstance().createContent(contentComponent2, "Tab 2", false);
         contentManager.addContent(content2);
     }
-
-    // Other methods of ToolWindowFactory...
 }
 
 
