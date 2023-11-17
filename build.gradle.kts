@@ -45,3 +45,7 @@ tasks {
     token.set(System.getenv("PUBLISH_TOKEN"))
   }
 }
+
+dependencies{
+  implementation("org.commonmark:commonmark:0.20.0")
+}
