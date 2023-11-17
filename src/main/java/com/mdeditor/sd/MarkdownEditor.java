@@ -7,9 +7,15 @@ import com.intellij.openapi.util.UserDataHolder;
 import com.intellij.openapi.vfs.newvfs.BulkFileListener;
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent;
 import com.intellij.openapi.vfs.*;
+import com.intellij.ui.components.JBScrollPane;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.LinkedList;
 import java.util.List;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
@@ -22,13 +28,17 @@ import java.io.InputStream;
 
 
 public class MarkdownEditor implements FileEditor, UserDataHolder {
+    // files
     private final VirtualFile file;
     private final Project project;
-
     private final String style;
-
-    private final JTextPane jTextPane = new JTextPane();
     private String content = null;
+
+    // for UI
+    private List<Block> list;
+    private Box interiorPanel; // for vertical align : blocks are in here
+    private JPanel wrapper;
+    private JScrollPane scrollPane; // for scroll
 
     public MarkdownEditor(Project project, VirtualFile file) {
         this.file = file;
@@ -37,15 +47,15 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
 
         setContentFromFile();
 
-        jTextPane.setContentType("text/html");
-        jTextPane.setEditable(true);
-
         // Add a listener to detect file editor changes
         project.getMessageBus().connect()
                 .subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, getFileEditorManagerListener());
         // Add a listener to detect file editor modified
         project.getMessageBus().connect()
                 .subscribe(VirtualFileManager.VFS_CHANGES, getFileChangeEventListener());
+
+        initUI();
+        setInitialUI();
     }
 
     //VirtualFile Save Function
@@ -58,6 +68,7 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
             }
         });
     }
+
     //Markdown to Editor
     private void setContentFromFile()
     {
@@ -69,7 +80,7 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
     }
 
     private BulkFileListener getFileChangeEventListener(){
-         return new BulkFileListener() {
+        return new BulkFileListener() {
             @Override
             public void after(@NotNull List<? extends @NotNull VFileEvent> events) {
                 for(VFileEvent event : events){
@@ -117,14 +128,85 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
         }
     }
 
+    private void initUI(){
+        list = new LinkedList<>();
+        interiorPanel = Box.createVerticalBox();
+        wrapper = new JPanel(new BorderLayout());
+        wrapper.add(interiorPanel, BorderLayout.PAGE_START);
+        scrollPane = new JBScrollPane(wrapper);
+    }
+
+    // set initial UI
+    private void setInitialUI(){
+        // FIXME : Below are just temporal code for test
+        for(int i = 0; i<5; i++){
+            Block block = new Block();
+            block.setContentType("text/html");
+            block.setText(makeHtmlWithCss("<u>Text</u>" + content));
+            block.setEditable(true);
+            block.setBackground(Color.white);
+            block.grabFocus();
+
+            // listen
+            block.addKeyListener(new KeyListener() {
+                @Override
+                public void keyTyped(KeyEvent e) {
+
+                }
+
+                @Override
+                public void keyPressed(KeyEvent e) {
+                    if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                        updateUI();
+                    }
+                }
+
+                @Override
+                public void keyReleased(KeyEvent e) {
+
+                }
+            });
+
+            list.add(block);
+        }
+
+        // FIXME : remove upper part. main logic is here.
+        for(JTextPane elem : list){
+            interiorPanel.add(elem);
+        }
+    }
+
+    private void updateUI() {
+        SwingUtilities.invokeLater(() -> {
+            update();
+        });
+    }
+
+    private void update(){
+        // FIXME : Below are just temporal code for test
+        Block block = new Block();
+        block.setText("asdf");
+        block.setEditable(true);
+        block.setBackground(Color.green);
+        block.grabFocus();
+        list.add(block);
+
+        // FIXME : remove upper part. main logic is here
+        interiorPanel.removeAll();
+        for(JTextPane elem : list){
+            interiorPanel.add(elem);
+        }
+
+        interiorPanel.revalidate();
+        interiorPanel.repaint();
+    }
+
     /**
      * Returns a component which represents the editor in UI.
      */
     @Override
     public @NotNull JComponent getComponent() {
-        jTextPane.setText(makeHtmlWithCss("<center><u>Text</u></center>" + content));
-
-        return jTextPane;
+        return scrollPane;
     }
 
     private String makeHtmlWithCss(String html){
@@ -201,7 +283,6 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
      */
     @Override
     public void dispose() {
-        System.out.println(jTextPane.getText());
     }
 
     /**
