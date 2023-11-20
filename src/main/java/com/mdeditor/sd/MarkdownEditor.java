@@ -134,7 +134,6 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
         };
     }
 
-
     private String HtmlParser(String html){
         Element body = Jsoup.parse(html).body();
         String text = body.text();
