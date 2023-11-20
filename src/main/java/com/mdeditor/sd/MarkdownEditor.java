@@ -47,6 +47,7 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
         EditorText.setContentType("text/html");
         EditorText.setEditable(true);
 
+
         // Add a listener to detect file editor changes
         project.getMessageBus().connect()
                 .subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, getFileEditorManagerListener());
@@ -92,7 +93,7 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
         return new FileEditorManagerListener() {
             @Override
             public void selectionChanged(@NotNull FileEditorManagerEvent event) {
-                // Check if the selected file is a markdown file and not the current file
+                // Check if the selected file is a MarkdownEditor
                 FileEditor selectedEditor = event.getNewEditor();
                 if (MarkdownEditor.this.equals(selectedEditor)) {
                     saveVirtualFile(project,file);
