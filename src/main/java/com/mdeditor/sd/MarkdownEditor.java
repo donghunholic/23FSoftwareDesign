@@ -122,8 +122,8 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
      */
     @Override
     public @NotNull JComponent getComponent() {
-        jTextPane.setText(makeHtmlWithCss("<center><u>Text</u></center>" + content));
-
+        //jTextPane.setText(makeHtmlWithCss("<center><u>Text</u></center>" + content));
+        jTextPane.setText(Utils.stringToHtml(content));
         return jTextPane;
     }
 

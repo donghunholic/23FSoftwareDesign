@@ -48,4 +48,5 @@ tasks {
 
 dependencies{
   implementation("org.commonmark:commonmark:0.20.0")
+  //implementation("org.commonmark:commonmark-ext-gfm-tables:0.20.0")
 }
