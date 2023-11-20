@@ -15,6 +15,8 @@ import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.project.ProjectManagerListener;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
@@ -49,6 +51,10 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
         // Add a listener to detect file editor changes
         project.getMessageBus().connect()
                 .subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, getFileEditorManagerListener());
+        project.getMessageBus().connect()
+                .subscribe(FileEditorManagerListener.Before.FILE_EDITOR_MANAGER, getFileEditorManagerListener_Before());
+        project.getMessageBus().connect()
+                .subscribe(ProjectManager.TOPIC, getProjectManagerListener());
     }
 
     //VirtualFile Save Function
@@ -100,12 +106,34 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
                         if (MarkdownEditor.this.equals(editor)) {
                             content=HtmlParser(jTextPane.getText());
                             setContentToFile();
+                            break;
                         }
                     }
                 }
             }
         };
     }
+
+    private FileEditorManagerListener.Before getFileEditorManagerListener_Before(){
+        return new FileEditorManagerListener.Before() {
+            @Override
+            public void beforeFileClosed(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
+                content=HtmlParser(jTextPane.getText());
+                setContentToFile();
+            }
+        };
+    }
+
+    private ProjectManagerListener getProjectManagerListener(){
+        return new ProjectManagerListener() {
+            @Override
+            public void projectClosing(@NotNull Project project) {
+                content = HtmlParser(jTextPane.getText());
+                setContentToFile();
+            }
+        };
+    }
+
 
     private String HtmlParser(String html){
         Element body = Jsoup.parse(html).body();
