@@ -35,7 +35,7 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
 
     private final String style;
 
-    private final JTextPane jTextPane = new JTextPane();
+    private final JTextPane EditorText = new JTextPane();
 
     public MarkdownEditor(Project project, VirtualFile file) {
         this.file = file;
@@ -44,8 +44,8 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
 
         updateEditor();
 
-        jTextPane.setContentType("text/html");
-        jTextPane.setEditable(true);
+        EditorText.setContentType("text/html");
+        EditorText.setEditable(true);
 
         // Add a listener to detect file editor changes
         project.getMessageBus().connect()
@@ -70,7 +70,7 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
     private void updateEditor()
     {
         try {
-            jTextPane.setText(VfsUtil.loadText(file));
+            EditorText.setText(VfsUtil.loadText(file));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -80,7 +80,7 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
         ApplicationManager.getApplication().runWriteAction(() ->{
         try {
             if (file != null) {
-                VfsUtil.saveText(file, HtmlParser(jTextPane.getText()));
+                VfsUtil.saveText(file, HtmlParser(EditorText.getText()));
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -133,7 +133,7 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
     private String HtmlParser(String html){
         Element body = Jsoup.parse(html).body();
         String text = body.text();
-        Elements centerTags = Jsoup.parse(jTextPane.getText()).select("center");
+        Elements centerTags = Jsoup.parse(EditorText.getText()).select("center");
         for (Element centerTag : centerTags) {
             text = text.replace(centerTag.text(), "");
         }
@@ -159,7 +159,7 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
      */
     @Override
     public @NotNull JComponent getComponent() {
-        return jTextPane;
+        return EditorText;
     }
 
     private String makeHtmlWithCss(String html){
@@ -236,7 +236,7 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
      */
     @Override
     public void dispose() {
-        System.out.println(jTextPane.getText());
+        System.out.println(EditorText.getText());
     }
 
     /**
