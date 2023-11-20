@@ -36,14 +36,13 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
     private final String style;
 
     private final JTextPane jTextPane = new JTextPane();
-    private String content = null;
 
     public MarkdownEditor(Project project, VirtualFile file) {
         this.file = file;
         this.project = project;
         this.style = readCss();
 
-        setContentFromFile();
+        updateEditor();
 
         jTextPane.setContentType("text/html");
         jTextPane.setEditable(true);
@@ -68,20 +67,20 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
         });
     }
     //Markdown to Editor
-    private void setContentFromFile()
+    private void updateEditor()
     {
         try {
-            content = VfsUtil.loadText(file);
+            jTextPane.setText(VfsUtil.loadText(file));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
     //Editor to Markdown
-    private void setContentToFile() {
+    private void updateMarkdownFile() {
         ApplicationManager.getApplication().runWriteAction(() ->{
         try {
             if (file != null) {
-                VfsUtil.saveText(file, content);
+                VfsUtil.saveText(file, HtmlParser(jTextPane.getText()));
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -97,15 +96,14 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
                 FileEditor selectedEditor = event.getNewEditor();
                 if (MarkdownEditor.this.equals(selectedEditor)) {
                     saveVirtualFile(project,file);
-                    setContentFromFile();
+                    updateEditor();
                 }
                 //Check if the selected file is not a markdown file
                 else{
                     FileEditor[] editors = FileEditorManager.getInstance(project).getAllEditors();
                     for(FileEditor editor : editors){
                         if (MarkdownEditor.this.equals(editor)) {
-                            content=HtmlParser(jTextPane.getText());
-                            setContentToFile();
+                            updateMarkdownFile();
                             break;
                         }
                     }
@@ -118,8 +116,7 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
         return new FileEditorManagerListener.Before() {
             @Override
             public void beforeFileClosed(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
-                content=HtmlParser(jTextPane.getText());
-                setContentToFile();
+                updateMarkdownFile();
             }
         };
     }
@@ -128,8 +125,7 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
         return new ProjectManagerListener() {
             @Override
             public void projectClosing(@NotNull Project project) {
-                content = HtmlParser(jTextPane.getText());
-                setContentToFile();
+                updateMarkdownFile();
             }
         };
     }
@@ -163,8 +159,6 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
      */
     @Override
     public @NotNull JComponent getComponent() {
-        //jTextPane.setText(makeHtmlWithCss("<center><u>Text</u></center>" + content));
-        jTextPane.setText(Utils.stringToHtml(content));
         return jTextPane;
     }
 
