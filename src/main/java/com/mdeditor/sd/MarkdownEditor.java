@@ -111,7 +111,6 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
             }
         };
     }
-
     private FileEditorManagerListener.Before getFileEditorManagerListener_Before(){
         return new FileEditorManagerListener.Before() {
             @Override
