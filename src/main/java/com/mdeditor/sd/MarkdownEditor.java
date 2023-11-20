@@ -14,6 +14,12 @@ import java.util.List;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.application.ApplicationManager;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+import java.io.IOException;
 
 import javax.swing.*;
 import java.beans.PropertyChangeListener;
@@ -43,9 +49,6 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
         // Add a listener to detect file editor changes
         project.getMessageBus().connect()
                 .subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, getFileEditorManagerListener());
-        // Add a listener to detect file editor modified
-        project.getMessageBus().connect()
-                .subscribe(VirtualFileManager.VFS_CHANGES, getFileChangeEventListener());
     }
 
     //VirtualFile Save Function
@@ -67,18 +70,17 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
             throw new RuntimeException(e);
         }
     }
-
-    private BulkFileListener getFileChangeEventListener(){
-         return new BulkFileListener() {
-            @Override
-            public void after(@NotNull List<? extends @NotNull VFileEvent> events) {
-                for(VFileEvent event : events){
-                    if(event.getFile().equals(file)){
-                        setContentFromFile();
-                    }
-                }
+    //Editor to Markdown
+    private void setContentToFile() {
+        ApplicationManager.getApplication().runWriteAction(() ->{
+        try {
+            if (file != null) {
+                VfsUtil.saveText(file, content);
             }
-        };
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        });
     }
 
     private FileEditorManagerListener getFileEditorManagerListener(){
@@ -86,23 +88,35 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
             @Override
             public void selectionChanged(@NotNull FileEditorManagerEvent event) {
                 // Check if the selected file is a markdown file and not the current file
-                System.out.println("selectionChanged called");
                 FileEditor selectedEditor = event.getNewEditor();
                 if (MarkdownEditor.this.equals(selectedEditor)) {
                     saveVirtualFile(project,file);
                     setContentFromFile();
                 }
+                //Check if the selected file is not a markdown file
                 else{
                     FileEditor[] editors = FileEditorManager.getInstance(project).getAllEditors();
                     for(FileEditor editor : editors){
                         if (MarkdownEditor.this.equals(editor)) {
-
+                            content=HtmlParser(jTextPane.getText());
+                            setContentToFile();
                         }
                     }
                 }
             }
         };
     }
+
+    private String HtmlParser(String html){
+        Element body = Jsoup.parse(html).body();
+        String text = body.text();
+        Elements centerTags = Jsoup.parse(jTextPane.getText()).select("center");
+        for (Element centerTag : centerTags) {
+            text = text.replace(centerTag.text(), "");
+        }
+        return text;
+    }
+
 
 
     private String readCss(){
