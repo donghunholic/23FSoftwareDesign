@@ -1,13 +1,14 @@
-package com.mdeditor.sd;
+package com.mdeditor.sd.editor;
 
 import com.intellij.openapi.fileEditor.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
-import com.intellij.openapi.util.UserDataHolder;
 import com.intellij.openapi.vfs.newvfs.BulkFileListener;
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent;
 import com.intellij.openapi.vfs.*;
 import com.intellij.ui.components.JBScrollPane;
+import com.mdeditor.sd.Block;
+import com.mdeditor.sd.Utils;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,9 +26,10 @@ import javax.swing.*;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Objects;
 
 
-public class MarkdownEditor implements FileEditor, UserDataHolder {
+public class MarkdownEditorImpl implements MarkdownEditor {
     // files
     private final VirtualFile file;
     private final Project project;
@@ -35,12 +37,11 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
     private String content = null;
 
     // for UI
-    private List<Block> list;
+    private List<Block> blocks;
     private Box interiorPanel; // for vertical align : blocks are in here
-    private JPanel wrapper;
     private JScrollPane scrollPane; // for scroll
 
-    public MarkdownEditor(Project project, VirtualFile file) {
+    public MarkdownEditorImpl(Project project, VirtualFile file) {
         this.file = file;
         this.project = project;
         this.style = readCss();
@@ -54,6 +55,7 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
         project.getMessageBus().connect()
                 .subscribe(VirtualFileManager.VFS_CHANGES, getFileChangeEventListener());
 
+        initBlocks();
         initUI();
         setInitialUI();
     }
@@ -73,7 +75,7 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
     private void setContentFromFile()
     {
         try {
-            content = VfsUtil.loadText(file);
+            content = VfsUtilCore.loadText(file);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -84,7 +86,7 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
             @Override
             public void after(@NotNull List<? extends @NotNull VFileEvent> events) {
                 for(VFileEvent event : events){
-                    if(event.getFile().equals(file)){
+                    if(Objects.equals(event.getFile(), file)){
                         setContentFromFile();
                     }
                 }
@@ -97,16 +99,15 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
             @Override
             public void selectionChanged(@NotNull FileEditorManagerEvent event) {
                 // Check if the selected file is a markdown file and not the current file
-                System.out.println("selectionChanged called");
                 FileEditor selectedEditor = event.getNewEditor();
-                if (MarkdownEditor.this.equals(selectedEditor)) {
+                if (MarkdownEditorImpl.this.equals(selectedEditor)) {
                     saveVirtualFile(project,file);
                     setContentFromFile();
                 }
                 else{
                     FileEditor[] editors = FileEditorManager.getInstance(project).getAllEditors();
                     for(FileEditor editor : editors){
-                        if (MarkdownEditor.this.equals(editor)) {
+                        if (MarkdownEditorImpl.this.equals(editor)) {
 
                         }
                     }
@@ -115,9 +116,8 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
         };
     }
 
-
     private String readCss(){
-        InputStream cssStream = getClass().getClassLoader().getResourceAsStream("editor/markdown.css");
+        InputStream cssStream = getClass().getClassLoader().getResourceAsStream("editor/github-markdown-light.css");
         if(cssStream == null) return "";
 
         try{
@@ -128,23 +128,16 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
         }
     }
 
-    private void initUI(){
-        list = new LinkedList<>();
-        interiorPanel = Box.createVerticalBox();
-        wrapper = new JPanel(new BorderLayout());
-        wrapper.add(interiorPanel, BorderLayout.PAGE_START);
-        scrollPane = new JBScrollPane(wrapper);
-    }
+    private void initBlocks(){
+        blocks = new LinkedList<>();
 
-    // set initial UI
-    private void setInitialUI(){
         // FIXME : Below are just temporal code for test
         for(int i = 0; i<5; i++){
             Block block = new Block();
             block.setContentType("text/html");
             block.setText(makeHtmlWithCss("<u>Text</u>" + content));
             block.setEditable(true);
-            block.setBackground(Color.white);
+            block.setBackground(Color.WHITE);
             block.grabFocus();
 
             // listen
@@ -167,33 +160,55 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
                 }
             });
 
-            list.add(block);
+            blocks.add(block);
         }
 
-        // FIXME : remove upper part. main logic is here.
-        for(JTextPane elem : list){
+        InputStream testHtmlStream = getClass().getClassLoader().getResourceAsStream("editor/markdown.html");
+        if(testHtmlStream != null){
+            try {
+                String testHtmlContent = new String(testHtmlStream.readAllBytes());
+
+                Block block = new Block();
+                block.setContentType("text/html");
+                block.setText(makeHtmlWithCss(testHtmlContent));
+                block.setEditable(true);
+                block.setBackground(Color.WHITE);
+                blocks.add(block);
+            }catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private void initUI(){
+        interiorPanel = Box.createVerticalBox();
+        JPanel wrapper = new JPanel(new BorderLayout());
+        wrapper.add(interiorPanel, BorderLayout.PAGE_START);
+        scrollPane = new JBScrollPane(wrapper);
+    }
+
+    // set initial UI
+    private void setInitialUI(){
+        for(Block elem : blocks){
             interiorPanel.add(elem);
         }
     }
 
-    private void updateUI() {
-        SwingUtilities.invokeLater(() -> {
-            update();
-        });
+    public void updateUI() {
+        SwingUtilities.invokeLater(this::update);
     }
 
     private void update(){
         // FIXME : Below are just temporal code for test
         Block block = new Block();
-        block.setText("asdf");
+        block.setText(content);
         block.setEditable(true);
-        block.setBackground(Color.green);
-        block.grabFocus();
-        list.add(block);
+        block.setBackground(Color.GREEN);
+        blocks.add(block);
 
         // FIXME : remove upper part. main logic is here
         interiorPanel.removeAll();
-        for(JTextPane elem : list){
+        for(JTextPane elem : blocks){
             interiorPanel.add(elem);
         }
 
