@@ -4,8 +4,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 public class SingleLineBlock extends Block {
-    public SingleLineBlock(MarkdownEditor mdE){
-        super(mdE);
+    public SingleLineBlock(BlockManager manager){
+        super(manager);
 
         this.addKeyListener(new KeyListener() {
             @Override

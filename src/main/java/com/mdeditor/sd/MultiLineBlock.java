@@ -13,8 +13,8 @@ public class MultiLineBlock extends Block {
      */
     public String prefix;
 
-    public MultiLineBlock(MarkdownEditor mdE, String pre){
-        super(mdE);
+    public MultiLineBlock(BlockManager manager, String pre){
+        super(manager);
         prefix = pre;
         this.addKeyListener(new KeyListener() {
             @Override

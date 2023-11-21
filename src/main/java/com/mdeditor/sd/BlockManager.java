@@ -1,15 +1,18 @@
 package com.mdeditor.sd;
 
+import com.intellij.util.containers.LinkedListWithSum;
 import org.apache.batik.bridge.Mark;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public class BlockManager {
-    private List<Block> blockList;
+    private final List<Block> blockList;
     private final MarkdownEditor mdEditor;
 
     public BlockManager(MarkdownEditor mdE) {
-        mdEditor = mdE;
+        this.blockList = new LinkedList<>();
+        this.mdEditor = mdE;
     }
     /* add block to blockList */
     public boolean attach(Block block) {
@@ -24,7 +27,7 @@ public class BlockManager {
     public void update(Block block, BlockEvent e) {
         switch (e) {
             case NEW_BLOCK -> {
-                blockList.add(blockList.indexOf(block), new Block(mdEditor));
+                blockList.add(blockList.indexOf(block), new Block(this));
             }
             case DELETE_BLOCK -> {
                 blockList.remove(block);
