@@ -1,4 +1,4 @@
-package com.mdeditor.sd;
+package com.mdeditor.sd.editor;
 
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorPolicy;
@@ -35,7 +35,7 @@ public class MarkdownEditorProvider implements FileEditorProvider {
      */
     @Override
     public @NotNull FileEditor createEditor(@NotNull Project project, @NotNull VirtualFile file) {
-        return new MarkdownEditor(project, file);
+        return new MarkdownEditorImpl(project, file);
     }
 
     /**
