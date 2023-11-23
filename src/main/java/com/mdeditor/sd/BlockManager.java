@@ -1,8 +1,5 @@
 package com.mdeditor.sd;
 
-import com.intellij.util.containers.LinkedListWithSum;
-import org.apache.batik.bridge.Mark;
-
 import java.util.LinkedList;
 
 public class BlockManager {
