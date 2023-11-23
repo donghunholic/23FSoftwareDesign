@@ -1,40 +1,39 @@
 package com.mdeditor.sd;
 
-import org.apache.batik.bridge.Mark;
-
-import java.util.List;
+import java.util.LinkedList;
 
 public class BlockManager {
-    private List<Block> blockList;
+    private final LinkedList<Block> blockList;
     private final MarkdownEditor mdEditor;
 
     public BlockManager(MarkdownEditor mdE) {
-        mdEditor = mdE;
-    }
-    /* add block to blockList */
-    public boolean attach(Block block) {
-        return blockList.add(block);
+        this.blockList = new LinkedList<>();
+        this.mdEditor = mdE;
     }
 
-    /* remove block to blockList */
-    public boolean detach(Block block) {
-        return blockList.remove(block);
-    }
-
+    /**
+     * Handle Focus event
+     * Block is created or deleted, request update to MarkdownEditor
+     */
     public void update(Block block, BlockEvent e) {
+        int temp = blockList.indexOf(block);
         switch (e) {
-            case NEW_BLOCK -> {
-                blockList.add(blockList.indexOf(block), new Block(mdEditor));
-            }
-            case DELETE_BLOCK -> {
+            case NEW_BLOCK :
+                blockList.add(blockList.indexOf(block), new Block(this));
+                //request update to mdEditor
+                break;
+            case DELETE_BLOCK :
                 blockList.remove(block);
-            }
-            case OUTFOCUS_BLOCK_UP -> {
-            }
-            case OUTFOCUS_BLOCK_DOWN -> {
-            }
-            default -> {
-            }
+                //request update to mdEditor
+                break;
+            case OUTFOCUS_BLOCK_UP :
+                blockList.get(temp == 0 ? 0 : temp - 1).requestFocus();
+                break;
+            case OUTFOCUS_BLOCK_DOWN :
+                blockList.get(temp == blockList.size() - 1 ? temp : temp + 1).requestFocus();
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + e);
         }
     }
 

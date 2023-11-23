@@ -11,13 +11,11 @@ import static com.mdeditor.sd.Utils.*;
 public class Block extends JTextPane {
 
     private String mdText;
-    private boolean isOnFocus;
-    private final MarkdownEditor mdEditor;
+    private final BlockManager blockManager;
 
-    public Block(MarkdownEditor mdE){
-        mdText = "";
-        isOnFocus = true;
-        mdEditor = mdE;
+    public Block(BlockManager manager){
+        this.mdText = "";
+        this.blockManager = manager;
     }
 
     public String getMdText(){
@@ -26,18 +24,6 @@ public class Block extends JTextPane {
 
     public void setMdText(String newText){
         mdText = newText;
-    }
-
-    public boolean getFocus(){
-        return isOnFocus;
-    }
-
-    public void setFocus(boolean newBool){
-        isOnFocus = newBool;
-    }
-
-    public void changeFocus(){
-        isOnFocus = !isOnFocus;
     }
 
     /**
@@ -64,28 +50,11 @@ public class Block extends JTextPane {
         return this;
     }
 
-    public MarkdownEditor getManager(){
-        return mdEditor;
-    }
-
-    @Override
-    public void grabFocus() {
-        super.grabFocus();
-        isOnFocus = true;
+    public BlockManager getManager(){
+        return blockManager;
     }
 
     public void requestManager(BlockEvent e){
-        switch (e) {
-            case NEW_BLOCK -> {
-            }
-            case DELETE_BLOCK -> {
-            }
-            case OUTFOCUS_BLOCK_UP -> {
-            }
-            case OUTFOCUS_BLOCK_DOWN -> {
-            }
-            default -> {
-            }
-        }
+        blockManager.update(this, e);
     }
 }
