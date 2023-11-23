@@ -2,6 +2,7 @@ plugins {
   id("java")
   id("org.jetbrains.kotlin.jvm") version "1.9.0"
   id("org.jetbrains.intellij") version "1.15.0"
+  id("jacoco")
 }
 
 group = "com.mdeditor"
@@ -10,6 +11,11 @@ version = "1.0-SNAPSHOT"
 repositories {
   mavenCentral()
 }
+
+jacoco {
+  toolVersion = "0.8.9"
+}
+
 
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
@@ -49,4 +55,17 @@ tasks {
 dependencies{
   implementation("org.commonmark:commonmark:0.20.0")
   //implementation("org.commonmark:commonmark-ext-gfm-tables:0.20.0")
+  testImplementation(platform("org.junit:junit-bom:5.9.1"))
+  testImplementation("org.junit.jupiter:junit-jupiter")
+  testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+tasks.test {
+  useJUnitPlatform()
+}
+
+tasks.jacocoTestReport {
+  reports {
+    csv.required.set(true)
+  }
 }
