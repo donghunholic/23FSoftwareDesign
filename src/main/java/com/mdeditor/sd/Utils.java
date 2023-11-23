@@ -5,7 +5,7 @@ public class Utils {
         return "<" + tag + ">" + content + "</" + tag + ">";
     }
 
-    public static String convertHTML(String markdownText){
+    public static String stringToHtml(String markdownText){
         return "";
     }
 }
