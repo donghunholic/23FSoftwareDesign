@@ -20,9 +20,11 @@ public class BlockManager {
         switch (e) {
             case NEW_BLOCK :
                 blockList.add(blockList.indexOf(block), new Block(this));
+                //request update to mdEditor
                 break;
             case DELETE_BLOCK :
                 blockList.remove(block);
+                //request update to mdEditor
                 break;
             case OUTFOCUS_BLOCK_UP :
                 blockList.get(temp == 0 ? 0 : temp - 1).requestFocus();
