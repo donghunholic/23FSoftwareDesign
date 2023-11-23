@@ -2,6 +2,7 @@ package com.mdeditor.sd;
 
 import com.intellij.util.containers.LinkedListWithSum;
 import org.apache.batik.bridge.Mark;
+import org.apache.commons.lang.ObjectUtils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -28,7 +29,7 @@ public class BlockManager {
         switch (e) {
             case NEW_BLOCK -> {
                 block.renderHTML();
-                blockList.add(idx, new Block(this));
+                blockList.add(idx, new SingleLineBlock(this));
                 blockList.get(idx+1).grabFocus();
 
                 //mdEditor.updateUI();
@@ -55,6 +56,20 @@ public class BlockManager {
                     block.renderHTML();
                     blockList.get(idx+1).grabFocus();
                 }
+            }
+            case SINGLE_TO_MULTI -> {
+                String temp = block.getCurText();
+                // new String() part must be changed to prefix
+                blockList.add(idx, new MultiLineBlock(this, new String()));
+                blockList.remove(block);
+                block.destruct();
+                blockList.get(idx).setMdText(temp);
+                blockList.get(idx).grabFocus();
+
+                //mdEditor.updateUI();
+            }
+            case MULTI_TO_SINGLE -> {
+                //How to implement?
             }
             default -> { throw new IllegalStateException("Unexpected value: " + e); }
         }
