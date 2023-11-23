@@ -44,8 +44,7 @@ public class MarkdownEditorImpl implements MarkdownEditor {
     private final Project project;
     private final String style;
 
-    private final JTextPane EditorText = new JTextPane();
-    private String content = null;
+    private final Block EditorText = new Block();
 
     // for UI
     private List<Block> blocks;
@@ -221,6 +220,8 @@ public class MarkdownEditorImpl implements MarkdownEditor {
         });
 
         blocks.add(block);
+
+        blocks.add(EditorText);
     }
 
     private void initUI(){
@@ -244,7 +245,7 @@ public class MarkdownEditorImpl implements MarkdownEditor {
     private void update(){
         // FIXME : Below are just temporal code for test
         Block block = new Block();
-        block.setText(content);
+        block.setText(EditorText.getText());
         block.setEditable(true);
         block.setBackground(Color.GREEN);
         blocks.add(block);
