@@ -18,6 +18,10 @@ public class BlockManager {
         blockList.get(0).grabFocus();
     }
 
+    /**
+     * Handle Focus event
+     * Block is created or deleted, request update to MarkdownEditor
+     */
     public void update(Block block, BlockEvent e) {
         int idx = blockList.indexOf(block);
 
@@ -52,7 +56,7 @@ public class BlockManager {
                     blockList.get(idx+1).grabFocus();
                 }
             }
-            default -> { }
+            default -> { throw new IllegalStateException("Unexpected value: " + e); }
         }
     }
 
