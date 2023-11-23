@@ -7,9 +7,14 @@ import com.intellij.openapi.util.UserDataHolder;
 import com.intellij.openapi.vfs.newvfs.BulkFileListener;
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent;
 import com.intellij.openapi.vfs.*;
+import com.intellij.ui.JBColor;
+import com.intellij.ui.components.JBScrollPane;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.awt.*;
+import java.util.LinkedList;
 import java.util.List;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
@@ -22,23 +27,25 @@ import java.io.InputStream;
 
 
 public class MarkdownEditor implements FileEditor, UserDataHolder {
+    // files
     private final VirtualFile file;
     private final Project project;
-
     private final String style;
-
-    private final JTextPane jTextPane = new JTextPane();
     private String content = null;
+    private BlockManager blockManager;
+
+    // for UI
+    private List<Block> list;
+    private Box interiorPanel; // for vertical align : blocks are in here
+    private JPanel wrapper;
+    private JScrollPane scrollPane; // for scroll
 
     public MarkdownEditor(Project project, VirtualFile file) {
         this.file = file;
         this.project = project;
         this.style = readCss();
-
+        this.blockManager = new BlockManager(this);
         setContentFromFile();
-
-        jTextPane.setContentType("text/html");
-        jTextPane.setEditable(true);
 
         // Add a listener to detect file editor changes
         project.getMessageBus().connect()
@@ -46,6 +53,9 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
         // Add a listener to detect file editor modified
         project.getMessageBus().connect()
                 .subscribe(VirtualFileManager.VFS_CHANGES, getFileChangeEventListener());
+
+        initUI();
+        setInitialUI();
     }
 
     //VirtualFile Save Function
@@ -58,6 +68,7 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
             }
         });
     }
+
     //Markdown to Editor
     private void setContentFromFile()
     {
@@ -69,7 +80,7 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
     }
 
     private BulkFileListener getFileChangeEventListener(){
-         return new BulkFileListener() {
+        return new BulkFileListener() {
             @Override
             public void after(@NotNull List<? extends @NotNull VFileEvent> events) {
                 for(VFileEvent event : events){
@@ -117,14 +128,40 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
         }
     }
 
+    private void initUI(){
+        interiorPanel = Box.createVerticalBox();
+        wrapper = new JPanel(new BorderLayout());
+        wrapper.add(interiorPanel, BorderLayout.PAGE_START);
+        scrollPane = new JBScrollPane(wrapper);
+    }
+
+    // set initial UI
+    private void setInitialUI(){
+        for(JTextPane elem : blockManager.getBlockList()){
+            interiorPanel.add(elem);
+        }
+    }
+
+    public void updateUI() {
+        SwingUtilities.invokeLater(this::update);
+    }
+
+    private void update(){
+        interiorPanel.removeAll();
+        for(JTextPane elem : blockManager.getBlockList()){
+            interiorPanel.add(elem);
+        }
+
+        interiorPanel.revalidate();
+        interiorPanel.repaint();
+    }
+
     /**
      * Returns a component which represents the editor in UI.
      */
     @Override
     public @NotNull JComponent getComponent() {
-        jTextPane.setText(makeHtmlWithCss("<center><u>Text</u></center>" + content));
-
-        return jTextPane;
+        return scrollPane;
     }
 
     private String makeHtmlWithCss(String html){
@@ -201,7 +238,6 @@ public class MarkdownEditor implements FileEditor, UserDataHolder {
      */
     @Override
     public void dispose() {
-        System.out.println(jTextPane.getText());
     }
 
     /**

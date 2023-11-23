@@ -6,11 +6,17 @@ import java.awt.event.KeyListener;
 public class SingleLineBlock extends Block {
     public SingleLineBlock(BlockManager manager){
         super(manager);
+        this.setText("SingleLineBlock");
 
         this.addKeyListener(new KeyListener() {
             @Override
             public void keyTyped(KeyEvent e) {
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
                 if(e.getKeyCode() == KeyEvent.VK_ENTER){
+                    e.consume();
                     requestManager(BlockEvent.NEW_BLOCK);
                 }
 
@@ -30,10 +36,9 @@ public class SingleLineBlock extends Block {
             }
 
             @Override
-            public void keyPressed(KeyEvent e) { }
+            public void keyReleased(KeyEvent e) {
 
-            @Override
-            public void keyReleased(KeyEvent e) { }
+            }
         });
     }
 

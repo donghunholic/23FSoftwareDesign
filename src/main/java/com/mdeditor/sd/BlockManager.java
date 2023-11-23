@@ -14,7 +14,7 @@ public class BlockManager {
         this.blockList = new LinkedList<>();
         this.mdEditor = mdE;
 
-        blockList.add(new Block(this));
+        blockList.add(new SingleLineBlock(this));
         blockList.get(0).grabFocus();
     }
 
@@ -28,10 +28,10 @@ public class BlockManager {
         switch (e) {
             case NEW_BLOCK -> {
                 block.renderHTML();
-                blockList.add(idx, new SingleLineBlock(this));
+                blockList.add(idx+1, new SingleLineBlock(this));
                 blockList.get(idx+1).requestFocusInWindow();
 
-                //mdEditor.updateUI();
+                mdEditor.updateUI();
             }
             case DELETE_BLOCK -> {
                 if(idx > 0){
@@ -40,7 +40,7 @@ public class BlockManager {
                     blockList.remove(block);
                     block.destruct();
                     newFocusBlock.requestFocusInWindow();
-                    //mdEditor.updateUI();
+                    mdEditor.updateUI();
                 }
             }
             case OUTFOCUS_BLOCK_UP -> {
@@ -57,6 +57,10 @@ public class BlockManager {
             }
             default -> { throw new IllegalStateException("Unexpected value: " + e); }
         }
+    }
+
+    public List<Block> getBlockList(){
+        return this.blockList;
     }
 
     /**

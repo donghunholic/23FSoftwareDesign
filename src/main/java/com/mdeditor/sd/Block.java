@@ -13,10 +13,14 @@ public class Block extends JTextPane {
     private String mdText;
     private BlockManager blockManager;
 
+    public final String indent = "  ";
+    private int indent_level;
+
     public Block(BlockManager manager){
         this.mdText = "";
         this.setEditable(true);
         this.blockManager = manager;
+        this.indent_level = 0;
     }
 
     /**
@@ -40,7 +44,7 @@ public class Block extends JTextPane {
      * using Utils.stringToHtml()
      */
     public void renderHTML(){
-        this.setMdText(getCurText());
+        this.setMdText(getCurText().stripTrailing());
         this.setText(Utils.stringToHtml(getMdText()));
 
     }
@@ -74,12 +78,6 @@ public class Block extends JTextPane {
      */
     public void requestManager(BlockEvent e){
         blockManager.update(this, e);
-    }
-
-    @Override
-    public void grabFocus(){
-        super.grabFocus();
-        renderMD();
     }
 
     @Override
