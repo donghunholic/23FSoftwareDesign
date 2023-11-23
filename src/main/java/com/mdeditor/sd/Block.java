@@ -82,6 +82,12 @@ public class Block extends JTextPane {
         renderMD();
     }
 
+    @Override
+    public boolean requestFocusInWindow(){
+        renderMD();
+        return super.requestFocusInWindow();
+    }
+
     /**
      * Clear mdText and deallocate blockManager
      * for garbage collection works to this block.

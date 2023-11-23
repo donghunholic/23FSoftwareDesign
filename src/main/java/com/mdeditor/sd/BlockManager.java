@@ -28,8 +28,8 @@ public class BlockManager {
         switch (e) {
             case NEW_BLOCK -> {
                 block.renderHTML();
-                blockList.add(idx, new Block(this));
-                blockList.get(idx+1).grabFocus();
+                blockList.add(idx, new SingleLineBlock(this));
+                blockList.get(idx+1).requestFocusInWindow();
 
                 //mdEditor.updateUI();
             }
@@ -39,21 +39,20 @@ public class BlockManager {
                     newFocusBlock.setMdText(newFocusBlock.getMdText() + block.getMdText());
                     blockList.remove(block);
                     block.destruct();
-                    newFocusBlock.grabFocus();
-
+                    newFocusBlock.requestFocusInWindow();
                     //mdEditor.updateUI();
                 }
             }
             case OUTFOCUS_BLOCK_UP -> {
                 if(idx > 0){
                     block.renderHTML();
-                    blockList.get(idx-1).grabFocus();
+                    blockList.get(idx-1).requestFocusInWindow();
                 }
             }
             case OUTFOCUS_BLOCK_DOWN -> {
                 if(idx < blockList.size()-1){
                     block.renderHTML();
-                    blockList.get(idx+1).grabFocus();
+                    blockList.get(idx+1).requestFocusInWindow();
                 }
             }
             default -> { throw new IllegalStateException("Unexpected value: " + e); }
