@@ -13,32 +13,59 @@ public class BlockManager {
     public BlockManager(MarkdownEditor mdE) {
         this.blockList = new LinkedList<>();
         this.mdEditor = mdE;
-    }
-    /* add block to blockList */
-    public boolean attach(Block block) {
-        return blockList.add(block);
-    }
 
-    /* remove block to blockList */
-    public boolean detach(Block block) {
-        return blockList.remove(block);
+        blockList.add(new Block(this));
+        blockList.get(0).grabFocus();
     }
 
     public void update(Block block, BlockEvent e) {
+        int idx = blockList.indexOf(block);
+
         switch (e) {
             case NEW_BLOCK -> {
-                blockList.add(blockList.indexOf(block), new Block(this));
+                block.renderHTML();
+                blockList.add(idx, new Block(this));
+                blockList.get(idx+1).grabFocus();
+
+                //mdEditor.updateUI();
             }
             case DELETE_BLOCK -> {
-                blockList.remove(block);
+                if(idx > 0){
+                    Block newFocusBlock = blockList.get(idx-1);
+                    newFocusBlock.setMdText(newFocusBlock.getMdText() + block.getMdText());
+                    blockList.remove(block);
+                    block.destruct();
+                    newFocusBlock.grabFocus();
+
+                    //mdEditor.updateUI();
+                }
             }
             case OUTFOCUS_BLOCK_UP -> {
+                if(idx > 0){
+                    block.renderHTML();
+                    blockList.get(idx-1).grabFocus();
+                }
             }
             case OUTFOCUS_BLOCK_DOWN -> {
+                if(idx < blockList.size()-1){
+                    block.renderHTML();
+                    blockList.get(idx+1).grabFocus();
+                }
             }
-            default -> {
-            }
+            default -> { }
         }
     }
 
+    /**
+     * Extract mdText sequentially from every block.
+     * @return Full Markdown text which will be saved into the (virtual) file.
+     */
+    public String extractFullMd(){
+        StringBuilder fullMd = new StringBuilder();
+        for(Block block : blockList){
+            fullMd.append(block.getMdText());
+            fullMd.append("\n");
+        }
+        return fullMd.toString();
+    }
 }
