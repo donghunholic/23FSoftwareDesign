@@ -11,35 +11,49 @@ import static com.mdeditor.sd.Utils.*;
 public class Block extends JTextPane {
 
     private String mdText;
-    private final BlockManager blockManager;
+    private BlockManager blockManager;
 
     public Block(BlockManager manager){
         this.mdText = "";
+        this.setEditable(true);
         this.blockManager = manager;
     }
 
+    /**
+     * Get block mdText
+     * @return mdText
+     */
     public String getMdText(){
-        return mdText;
+        return this.mdText;
     }
 
+    /**
+     * Set mdText to newText.
+     * Called inside renderHTML()
+     */
     public void setMdText(String newText){
         mdText = newText;
     }
 
     /**
      * convert mdText to HTML
-     * convertHTML() // TODO
+     * using Utils.stringToHtml()
      */
     public void renderHTML(){
+        this.setMdText(getCurText());
         this.setText(Utils.stringToHtml(getMdText()));
+
     }
 
+    /**
+     * Set block's jTextPane to mdText
+     */
     public void renderMD(){
         this.setText(mdText);
     }
 
     /**
-     * Caution: this is from View.
+     * Caution: String is from jTextPane.
      * @return string from jTextPane
      */
     public String getCurText(){
@@ -54,7 +68,26 @@ public class Block extends JTextPane {
         return blockManager;
     }
 
+    /**
+     * Requests blockManager to handle BlockEvents by keyListener
+     * @param e - See BlockEvent.java
+     */
     public void requestManager(BlockEvent e){
         blockManager.update(this, e);
+    }
+
+    @Override
+    public void grabFocus(){
+        super.grabFocus();
+        renderMD();
+    }
+
+    /**
+     * Clear mdText and deallocate blockManager
+     * for garbage collection works to this block.
+     */
+    public void destruct(){
+        mdText = null;
+        blockManager = null;
     }
 }
