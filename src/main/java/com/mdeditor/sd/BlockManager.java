@@ -19,24 +19,22 @@ public class BlockManager {
      * Block is created or deleted, request update to MarkdownEditor
      */
     public void update(Block block, BlockEvent e) {
+        int temp = blockList.indexOf(block);
         switch (e) {
-            case NEW_BLOCK -> {
+            case NEW_BLOCK :
                 blockList.add(blockList.indexOf(block), new Block(this));
-
-            }
-            case DELETE_BLOCK -> {
+                break;
+            case DELETE_BLOCK :
                 blockList.remove(block);
-            }
-            case OUTFOCUS_BLOCK_UP -> {
-                int temp = blockList.indexOf(block);
+                break;
+            case OUTFOCUS_BLOCK_UP :
                 blockList.get(temp == 0 ? 0 : temp - 1).requestFocus();
-            }
-            case OUTFOCUS_BLOCK_DOWN -> {
-                int temp = blockList.indexOf(block);
+                break;
+            case OUTFOCUS_BLOCK_DOWN :
                 blockList.get(temp == blockList.size() - 1 ? temp : temp + 1).requestFocus();
-            }
-            default -> {
-            }
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + e);
         }
     }
 
