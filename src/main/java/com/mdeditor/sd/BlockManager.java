@@ -55,6 +55,19 @@ public class BlockManager {
                     blockList.get(idx+1).requestFocusInWindow();
                 }
             }
+            case TRANSFORM_MULTI -> {
+                String temp = block.getCurText();
+
+                /* Caution! : prefix parameter must be implemented */
+                blockList.add(idx, new MultiLineBlock(this, new String()));
+                blockList.remove(block);
+                block.destruct();
+                blockList.get(idx).setMdText(temp);
+                blockList.get(idx).requestFocusInWindow();
+            }
+            case TRANSFORM_SINGLE -> {
+                //implement multi block to single block
+            }
             default -> { throw new IllegalStateException("Unexpected value: " + e); }
         }
     }
