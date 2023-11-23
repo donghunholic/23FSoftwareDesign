@@ -1,7 +1,7 @@
 package com.mdeditor.sd;
 
 public class TextBlock extends SingleLineBlock {
-    public TextBlock(MarkdownEditor mdE) {
-        super(mdE);
+    public TextBlock(BlockManager manager) {
+        super(manager);
     }
 }

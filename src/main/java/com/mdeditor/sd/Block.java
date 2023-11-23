@@ -31,7 +31,7 @@ public class Block extends JTextPane {
      * convertHTML() // TODO
      */
     public void renderHTML(){
-        this.setText(convertHTML(getMdText()));
+        this.setText(Utils.stringToHtml(getMdText()));
     }
 
     public void renderMD(){
