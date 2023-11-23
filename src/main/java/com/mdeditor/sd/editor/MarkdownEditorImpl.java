@@ -9,6 +9,7 @@ import com.intellij.openapi.vfs.newvfs.events.VFileEvent;
 import com.intellij.openapi.vfs.*;
 import com.intellij.ui.components.JBScrollPane;
 import com.mdeditor.sd.Block;
+import com.mdeditor.sd.BlockManager;
 import com.mdeditor.sd.Utils;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -44,7 +45,9 @@ public class MarkdownEditorImpl implements MarkdownEditor {
     private final Project project;
     private final String style;
 
-    private final Block EditorText = new Block();
+    private final Block EditorText;
+
+    private BlockManager blockManager;
 
     // for UI
     private List<Block> blocks;
@@ -55,11 +58,12 @@ public class MarkdownEditorImpl implements MarkdownEditor {
         this.file = file;
         this.project = project;
         this.style = readCss();
-
+        this.blockManager = new BlockManager((MarkdownEditor)this);
+        this.EditorText = new Block(this.blockManager);
         updateEditor();
 
-//        EditorText.setContentType("text/html");
-//        EditorText.setEditable(true);
+        EditorText.setContentType("text/html");
+        EditorText.setEditable(true);
 
 
         // Add a listener to detect file editor changes
@@ -149,18 +153,6 @@ public class MarkdownEditorImpl implements MarkdownEditor {
         };
     }
 
-//    private String HtmlParser(String html){
-//        Element body = Jsoup.parse(html).body();
-//        String text = body.text();
-//        Elements centerTags = Jsoup.parse(EditorText.getText()).select("center");
-//        for (Element centerTag : centerTags) {
-//            text = text.replace(centerTag.text(), "");
-//        }
-//        return text;
-//    }
-
-
-
     private String readCss(){
         InputStream cssStream = getClass().getClassLoader().getResourceAsStream("editor/github-markdown-light.css");
         if(cssStream == null) return "";
@@ -177,51 +169,31 @@ public class MarkdownEditorImpl implements MarkdownEditor {
         blocks = new LinkedList<>();
 
 
-        InputStream testHtmlStream = getClass().getClassLoader().getResourceAsStream("editor/markdown.html");
-        if(testHtmlStream != null){
-            try {
-                String testHtmlContent = new String(testHtmlStream.readAllBytes());
+//        InputStream testHtmlStream = getClass().getClassLoader().getResourceAsStream("editor/markdown.html");
+//        if(testHtmlStream != null){
+//            try {
+//                String testHtmlContent = new String(testHtmlStream.readAllBytes());
+//
+//                Block block = new Block(this.blockManager);
+//                block.setContentType("text/html");
+//                block.setText(makeHtmlWithCss(testHtmlContent));
+//                block.setEditable(true);
+//                block.setBackground(Color.WHITE);
+//                blocks.add(block);
+//            }catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
+//        }
 
-                Block block = new Block();
-                block.setContentType("text/html");
-                block.setText(makeHtmlWithCss(testHtmlContent));
-                block.setEditable(true);
-                block.setBackground(Color.WHITE);
-                blocks.add(block);
-            }catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        //TODO: File loading,
+        //Codes above are example of load file
+        //codes below are example of current editor
 
-
-        Block block = new Block();
+        Block block = new Block(this.blockManager);
         block.setContentType("text/html");
         block.setText(makeHtmlWithCss(Utils.stringToHtml(EditorText.getText())));
         block.setEditable(true);
         block.setBackground(Color.WHITE);
-
-        block.addKeyListener(new KeyListener() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-
-            }
-
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    updateUI();
-                }
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-
-            }
-        });
-
-        blocks.add(block);
-
-        blocks.add(EditorText);
     }
 
     private void initUI(){
@@ -233,7 +205,7 @@ public class MarkdownEditorImpl implements MarkdownEditor {
 
     // set initial UI
     private void setInitialUI(){
-        for(Block elem : blocks){
+        for(Block elem : blockManager.getBlockList()){
             interiorPanel.add(elem);
         }
     }
@@ -243,16 +215,8 @@ public class MarkdownEditorImpl implements MarkdownEditor {
     }
 
     private void update(){
-        // FIXME : Below are just temporal code for test
-        Block block = new Block();
-        block.setText(EditorText.getText());
-        block.setEditable(true);
-        block.setBackground(Color.GREEN);
-        blocks.add(block);
-
-        // FIXME : remove upper part. main logic is here
         interiorPanel.removeAll();
-        for(JTextPane elem : blocks){
+        for(JTextPane elem : blockManager.getBlockList()){
             interiorPanel.add(elem);
         }
 
