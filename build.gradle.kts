@@ -54,7 +54,7 @@ tasks {
 
 dependencies{
   implementation("org.commonmark:commonmark:0.20.0")
-  //implementation("org.commonmark:commonmark-ext-gfm-tables:0.20.0")
+  implementation("org.commonmark:commonmark-ext-gfm-tables:0.20.0")
   testImplementation(platform("org.junit:junit-bom:5.9.1"))
   testImplementation("org.junit.jupiter:junit-jupiter")
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
