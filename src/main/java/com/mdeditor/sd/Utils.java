@@ -16,7 +16,6 @@ public class Utils {
 
     public static String stringToHtml(String str){
         List<Extension> extensions = Arrays.asList(TablesExtension.create());
-        extensions.add((Extension)AutolinkExtension.create());
         Parser parser = Parser.builder()
                 .extensions(extensions)
                 .build();
