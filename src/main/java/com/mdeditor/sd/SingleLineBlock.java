@@ -1,7 +1,6 @@
 package com.mdeditor.sd;
 
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.*;
 
 public class SingleLineBlock extends Block {
     public SingleLineBlock(BlockManager manager){
@@ -25,20 +24,17 @@ public class SingleLineBlock extends Block {
                 }
 
                 else if(e.getKeyCode() == KeyEvent.VK_UP){
-                    if(getCaretPosition() != 0) setCaretPosition(0);
-                    else requestManager(BlockEvent.OUTFOCUS_BLOCK_UP);
+                    requestManager(BlockEvent.OUTFOCUS_BLOCK_UP);
                 }
 
                 else if(e.getKeyCode() == KeyEvent.VK_DOWN){
-                    if(getCaretPosition() != getCurText().length()) setCaretPosition(getCurText().length());
-                    else requestManager(BlockEvent.OUTFOCUS_BLOCK_DOWN);
+                    requestManager(BlockEvent.OUTFOCUS_BLOCK_DOWN);
                 }
             }
 
             @Override
-            public void keyReleased(KeyEvent e) {
+            public void keyReleased(KeyEvent e) { }
 
-            }
         });
     }
 

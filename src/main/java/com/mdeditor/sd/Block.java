@@ -1,6 +1,10 @@
 package com.mdeditor.sd;
 
 import javax.swing.*;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 /**
  * Block contains mdText.
@@ -20,6 +24,26 @@ public class Block extends JTextPane {
         this.setEditable(true);
         this.blockManager = manager;
         this.indent_level = 0;
+
+
+        this.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                requestManager(BlockEvent.OUTFOCUS_CLICKED);
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) { }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {  }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {  }
+
+            @Override
+            public void mouseExited(MouseEvent e) {  }
+        });
     }
 
     /**

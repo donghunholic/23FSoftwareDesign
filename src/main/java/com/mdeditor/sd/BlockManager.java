@@ -8,6 +8,7 @@ import java.util.List;
 public class BlockManager {
     private final List<Block> blockList;
     private final MarkdownEditor mdEditor;
+    private Block blockOnFocus;
 
     public BlockManager(MarkdownEditor mdE) {
         this.blockList = new LinkedList<>();
@@ -15,6 +16,7 @@ public class BlockManager {
 
         blockList.add(new SingleLineBlock(this));
         blockList.get(0).grabFocus();
+        this.blockOnFocus = blockList.get(0);
     }
 
     /**
@@ -28,9 +30,9 @@ public class BlockManager {
             case NEW_BLOCK -> {
                 block.renderHTML();
                 blockList.add(idx+1, new SingleLineBlock(this));
-                blockList.get(idx+1).requestFocusInWindow();
-
                 mdEditor.updateUI();
+                blockList.get(idx+1).requestFocusInWindow();
+                this.blockOnFocus = blockList.get(idx+1);
             }
             case DELETE_BLOCK -> {
                 if(idx > 0){
@@ -38,21 +40,30 @@ public class BlockManager {
                     newFocusBlock.setMdText(newFocusBlock.getMdText() + block.getMdText());
                     blockList.remove(block);
                     block.destruct();
-                    newFocusBlock.requestFocusInWindow();
                     mdEditor.updateUI();
+                    newFocusBlock.requestFocusInWindow();
+                    this.blockOnFocus = newFocusBlock;
                 }
             }
             case OUTFOCUS_BLOCK_UP -> {
                 if(idx > 0){
                     block.renderHTML();
                     blockList.get(idx-1).requestFocusInWindow();
+                    this.blockOnFocus = blockList.get(idx-1);
                 }
             }
             case OUTFOCUS_BLOCK_DOWN -> {
                 if(idx < blockList.size()-1){
                     block.renderHTML();
                     blockList.get(idx+1).requestFocusInWindow();
+                    this.blockOnFocus = blockList.get(idx+1);
                 }
+            }
+            case OUTFOCUS_CLICKED ->{
+                this.blockOnFocus.renderHTML();
+                block.renderMD();
+                blockOnFocus = block;
+
             }
             case TRANSFORM_MULTI -> {
                 String temp = block.getCurText();
