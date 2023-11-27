@@ -93,4 +93,8 @@ public class Block extends JTextPane {
         mdText = null;
         blockManager = null;
     }
+
+    public int getIndent_level(){
+        return this.indent_level;
+    }
 }

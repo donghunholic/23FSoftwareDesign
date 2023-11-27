@@ -55,7 +55,7 @@ public class BlockManager {
                 }
             }
             case TRANSFORM_MULTI -> {
-                String temp = block.getCurText();
+                String temp = block.getMdText();
 
                 /* Caution! : prefix parameter must be implemented */
                 blockList.add(idx, new MultiLineBlock(this, new String()));
