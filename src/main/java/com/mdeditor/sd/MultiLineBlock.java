@@ -20,11 +20,11 @@ public class MultiLineBlock extends Block {
             @Override
             public void keyTyped(KeyEvent e) {
                 if(e.getKeyCode() == KeyEvent.VK_ENTER){
-                    if(!prefix.isEmpty() && getCurText().substring(getCurText().length()-prefix.length()).equals(prefix)){
+                    if(!prefix.isEmpty() && getMdText().substring(getMdText().length()-prefix.length()).equals(prefix)){
                         requestManager(BlockEvent.NEW_BLOCK);
                     }
                     else {
-                        getBlock().setText(getCurText() + "\n" + prefix);
+                        getBlock().setText(getMdText() + "\n" + prefix);
                     }
                 }
 
@@ -38,7 +38,7 @@ public class MultiLineBlock extends Block {
                 }
 
                 else if(e.getKeyCode() == KeyEvent.VK_DOWN){
-                    if(getCaretPosition() != getCurText().length()) setCaretPosition(getCurText().length());
+                    if(getCaretPosition() != getMdText().length()) setCaretPosition(getMdText().length());
                     else requestManager(BlockEvent.OUTFOCUS_BLOCK_DOWN);
                 }
             }

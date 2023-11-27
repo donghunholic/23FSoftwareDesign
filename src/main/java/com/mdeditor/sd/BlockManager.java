@@ -25,14 +25,20 @@ public class BlockManager {
      */
     public void update(Block block, BlockEvent e) {
         int idx = blockList.indexOf(block);
+        blockOnFocus.setMdText(blockOnFocus.getText().strip());
 
         switch (e) {
             case NEW_BLOCK -> {
+                String str = block.getMdText().substring(block.getCaretPosition()-1);
+                block.setMdText(block.getMdText().substring(0,block.getCaretPosition()-1));
                 block.renderHTML();
-                blockList.add(idx+1, new SingleLineBlock(this));
+                SingleLineBlock newBlock = new SingleLineBlock(this);
+                newBlock.setMdText(str);
+                blockList.add(idx+1, newBlock);
+
                 mdEditor.updateUI();
-                blockList.get(idx+1).requestFocusInWindow();
-                this.blockOnFocus = blockList.get(idx+1);
+                newBlock.requestFocusInWindow();
+                this.blockOnFocus = newBlock;
             }
             case DELETE_BLOCK -> {
                 if(idx > 0){
@@ -60,13 +66,12 @@ public class BlockManager {
                 }
             }
             case OUTFOCUS_CLICKED ->{
-                this.blockOnFocus.renderHTML();
+                blockOnFocus.renderHTML();
                 block.renderMD();
                 blockOnFocus = block;
-
             }
             case TRANSFORM_MULTI -> {
-                String temp = block.getCurText();
+                String temp = block.getMdText();
 
                 /* Caution! : prefix parameter must be implemented */
                 blockList.add(idx, new MultiLineBlock(this, new String()));

@@ -8,8 +8,8 @@ import java.awt.event.MouseListener;
 
 /**
  * Block contains mdText.
- * When the block is out of focus, setText(MD2HTML) // MD2HTML : commonmark util function
- * When the block grabs focus, setText(getMdText)
+ * When the block is out of focus, renderHTML()
+ * When the block grabs focus, renderMD()
  */
 public class Block extends JTextPane {
 
@@ -67,9 +67,7 @@ public class Block extends JTextPane {
      * using Utils.stringToHtml()
      */
     public void renderHTML(){
-        this.setMdText(getCurText().stripTrailing());
         this.setText(Utils.stringToHtml(getMdText()));
-
     }
 
     /**
@@ -77,14 +75,6 @@ public class Block extends JTextPane {
      */
     public void renderMD(){
         this.setText(mdText);
-    }
-
-    /**
-     * Caution: String is from jTextPane.
-     * @return string from jTextPane
-     */
-    public String getCurText(){
-        return this.getText();
     }
 
     public Block getBlock(){

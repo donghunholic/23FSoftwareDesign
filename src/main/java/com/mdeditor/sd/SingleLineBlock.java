@@ -5,7 +5,6 @@ import java.awt.event.*;
 public class SingleLineBlock extends Block {
     public SingleLineBlock(BlockManager manager){
         super(manager);
-        this.setText("SingleLineBlock");
 
         this.addKeyListener(new KeyListener() {
             @Override
@@ -18,13 +17,12 @@ public class SingleLineBlock extends Block {
 
             @Override
             public void keyReleased(KeyEvent e) {
-                System.out.println(e.getKeyCode());
                 if(e.getKeyCode() == KeyEvent.VK_ENTER){
-                    //e.consume();
+                    e.consume();
                     requestManager(BlockEvent.NEW_BLOCK);
                 }
 
-                else if(e.getKeyCode() == KeyEvent.VK_BACK_SPACE && getCaretPosition() == 0){
+                else if(getCaretPosition() == 0 && e.getKeyCode() == KeyEvent.VK_BACK_SPACE){
                     requestManager(BlockEvent.DELETE_BLOCK);
                 }
 
