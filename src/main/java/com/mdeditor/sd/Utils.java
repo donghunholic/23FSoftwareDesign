@@ -47,7 +47,7 @@ public class Utils {
     public boolean table_check(Block block){
         String temp = block.getMdText();
         if (temp.startsWith("|") && temp.endsWith("|")) {}
-
+        return true;
     }
 }
 
