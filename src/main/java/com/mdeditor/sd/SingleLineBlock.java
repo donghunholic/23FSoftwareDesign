@@ -14,8 +14,13 @@ public class SingleLineBlock extends Block {
 
             @Override
             public void keyPressed(KeyEvent e) {
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                System.out.println(e.getKeyCode());
                 if(e.getKeyCode() == KeyEvent.VK_ENTER){
-                    e.consume();
+                    //e.consume();
                     requestManager(BlockEvent.NEW_BLOCK);
                 }
 
@@ -31,9 +36,6 @@ public class SingleLineBlock extends Block {
                     requestManager(BlockEvent.OUTFOCUS_BLOCK_DOWN);
                 }
             }
-
-            @Override
-            public void keyReleased(KeyEvent e) { }
 
         });
     }
