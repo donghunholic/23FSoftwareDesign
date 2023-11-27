@@ -38,6 +38,7 @@ public class BlockManager {
 
                 mdEditor.updateUI();
                 newBlock.requestFocusInWindow();
+                //newBlock.renderMD();
                 this.blockOnFocus = newBlock;
             }
             case DELETE_BLOCK -> {
@@ -68,6 +69,7 @@ public class BlockManager {
             case OUTFOCUS_CLICKED ->{
                 blockOnFocus.renderHTML();
                 block.renderMD();
+                //block.requestFocusInWindow();
                 blockOnFocus = block;
             }
             case TRANSFORM_MULTI -> {

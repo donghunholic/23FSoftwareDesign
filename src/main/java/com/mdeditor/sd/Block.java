@@ -67,6 +67,7 @@ public class Block extends JTextPane {
      * using Utils.stringToHtml()
      */
     public void renderHTML(){
+        this.setContentType("text/html");
         this.setText(Utils.stringToHtml(getMdText()));
     }
 
@@ -74,6 +75,7 @@ public class Block extends JTextPane {
      * Set block's jTextPane to mdText
      */
     public void renderMD(){
+        this.setContentType("text/plain");
         this.setText(mdText);
     }
 
