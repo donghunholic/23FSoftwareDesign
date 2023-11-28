@@ -1,11 +1,15 @@
 package com.mdeditor.sd;
 
 import javax.swing.*;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 /**
  * Block contains mdText.
- * When the block is out of focus, setText(MD2HTML) // MD2HTML : commonmark util function
- * When the block grabs focus, setText(getMdText)
+ * When the block is out of focus, renderHTML()
+ * When the block grabs focus, renderMD()
  */
 public class Block extends JTextPane {
 
@@ -20,6 +24,26 @@ public class Block extends JTextPane {
         this.setEditable(true);
         this.blockManager = manager;
         this.indent_level = 0;
+
+
+        this.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                requestManager(BlockEvent.OUTFOCUS_CLICKED);
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) { }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {  }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {  }
+
+            @Override
+            public void mouseExited(MouseEvent e) {  }
+        });
     }
 
     /**
@@ -43,24 +67,16 @@ public class Block extends JTextPane {
      * using Utils.stringToHtml()
      */
     public void renderHTML(){
-        this.setMdText(getCurText().stripTrailing());
+        this.setContentType("text/html");
         this.setText(Utils.stringToHtml(getMdText()));
-
     }
 
     /**
      * Set block's jTextPane to mdText
      */
     public void renderMD(){
+        this.setContentType("text/plain");
         this.setText(mdText);
-    }
-
-    /**
-     * Caution: String is from jTextPane.
-     * @return string from jTextPane
-     */
-    public String getCurText(){
-        return this.getText();
     }
 
     public Block getBlock(){
