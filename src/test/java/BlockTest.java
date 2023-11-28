@@ -30,6 +30,7 @@ public class BlockTest {
         String content = "# Head1";
         block.setText(content);
         block.renderHTML();
+        // assertEquals(block.getContentType(), "text/html");
         assertEquals(block.getMdText(), content);
         assertEquals(block.getText(), Utils.stringToHtml(content));
     }
@@ -39,6 +40,8 @@ public class BlockTest {
         String content = "# Head1";
         block.setMdText(content);
         block.renderMD();
+        // assertEquals(block.getContentType(), "text/plain");
+        assertEquals(block.getMdText(), content);
         assertEquals(block.getText(), content);
     }
 
