@@ -57,6 +57,7 @@ dependencies{
   implementation("org.commonmark:commonmark-ext-gfm-tables:0.20.0")
   testImplementation(platform("org.junit:junit-bom:5.9.1"))
   testImplementation("org.junit.jupiter:junit-jupiter")
+  testImplementation("org.mockito:mockito-core:4.8.0")
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
