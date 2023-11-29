@@ -1,7 +1,11 @@
 import com.mdeditor.sd.Utils;
+import com.vladsch.flexmark.util.sequence.BasedSequence;
+import org.jetbrains.annotations.NotNull;
+import org.jsoup.Jsoup;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import com.vladsch.flexmark.util.ast.Node;
 
 import java.nio.file.Files;
 import java.util.HashSet;
@@ -17,7 +21,7 @@ public class UtilTest {
         String content = "plain text";
         String expected = "<p>plain text</p>";
 
-        assertEquals(Utils.wrapWithHtmlTag(tag, content), expected);
+        assertEquals(expected, Utils.wrapWithHtmlTag(tag, content));
     }
 
     @ParameterizedTest(name = "testStringToHtml_{index}")
@@ -31,27 +35,28 @@ public class UtilTest {
             "Markdown GitHub CSS, <p>Markdown GitHub CSS</p>",
             "**bold**, <p><strong>bold</strong></p>",
             "_italics_, <p><em>italics</em></p>",
+            "~~strikethrough~~, <p><s>strikethrough</s></p>",
             "[link](csed332.postech.ac.kr), <p><a href=\"csed332.postech.ac.kr\">link</a></p>",
             "inline code block `int a = b;`, <p>inline code block <code>int a = b;</code></p>"
     })
     void testStringToHtmlSingleLine(String string, String expected) {
-        assertEquals(Utils.stringToHtml(string).trim(), expected);
+        String html = Utils.stringToHtml(string);
+        String result = Jsoup.parse(html).select(" body > *").get(0).toString();
+        assertEquals(expected, result);
     }
 
     @Test
     void testStringToHtmlMultiLineList() {
         String expected = """
-<ul>
-<li>Unordered List 1
-<ol>
-<li>ordered list</li>
-<li>ordered list</li>
-<li>ordered list</li>
-</ol>
-</li>
-<li>Unordered List 2</li>
-</ul>
-              """;
+<ul>\s
+ <li>Unordered List 1\s
+  <ol>\s
+   <li>ordered list</li>\s
+   <li>ordered list</li>\s
+   <li>ordered list</li>\s
+  </ol> </li>\s
+ <li>Unordered List 2</li>\s
+</ul>""";
         String content = """
 * Unordered List 1
     1. ordered list
@@ -59,17 +64,19 @@ public class UtilTest {
     3. ordered list
 * Unordered List 2
                 """;
-        assertEquals(Utils.stringToHtml(content), expected);
+
+        String html = Utils.stringToHtml(content);
+        String result = Jsoup.parse(html).select(" body > *").get(0).toString();
+        assertEquals(expected, result);
     }
 
     @Test
     void testStringToHtmlMultiLineCodeBlock() {
         String expected = """
 <pre><code class="language-java">void function(){
-    System.out.println(&quot;hello world!&quot;);
+    System.out.println("hello world!");
 }
-</code></pre>
-""";
+</code></pre>""";
         String content = """
 ```java
 void function(){
@@ -77,21 +84,34 @@ void function(){
 }
 ```
                 """;
-        assertEquals(Utils.stringToHtml(content), expected);
+        String html = Utils.stringToHtml(content);
+        String result = Jsoup.parse(html).select(" body > *").get(0).toString();
+        assertEquals(expected, result);
     }
 
     @Test
     void testStringToHtmlMultiLineQuote() {
         String expected = """
-<blockquote>
-<p>quote 1
-quote 2</p>
-</blockquote>
-""";
+<blockquote>\s
+ <p>quote 1 quote 2</p>\s
+</blockquote>""";
         String content = """
 > quote 1
 > quote 2
                 """;
-        assertEquals(Utils.stringToHtml(content), expected);
+        String html = Utils.stringToHtml(content);
+        String result = Jsoup.parse(html).select(" body > *").get(0).toString();
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void testFlexmarkParse(){
+        assertEquals("input", Utils.flexmarkParse("input").getChars().toString());
+    }
+
+    @Test
+    void testFlexmarkHtmlRender(){
+        Node node = Utils.flexmarkParse("input");
+        assertEquals("<p>input</p>", Utils.flexmarkHtmlRender(node).trim());
     }
 }
