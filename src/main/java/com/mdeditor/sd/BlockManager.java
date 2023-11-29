@@ -99,8 +99,14 @@ public class BlockManager {
     public String extractFullMd(){
         StringBuilder fullMd = new StringBuilder();
         for(Block block : blockList){
-            fullMd.append(block.getMdText());
-            fullMd.append("\n");
+            if(block == blockOnFocus){
+                fullMd.append(block.getText());
+            }
+            else{
+                fullMd.append(block.getMdText());
+            }
+
+            fullMd.append("\n\n");
         }
         return fullMd.toString();
     }

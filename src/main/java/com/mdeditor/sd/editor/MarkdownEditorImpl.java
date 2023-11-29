@@ -100,13 +100,13 @@ public class MarkdownEditorImpl implements MarkdownEditor {
     //Editor to Markdown
     private void updateMarkdownFile() {
         ApplicationManager.getApplication().runWriteAction(() ->{
-        try {
-            if (file != null) {
-                VfsUtil.saveText(file, EditorText.getText());
+            try {
+                if (file != null) {
+                    VfsUtil.saveText(file, blockManager.extractFullMd());
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
         });
     }
 
