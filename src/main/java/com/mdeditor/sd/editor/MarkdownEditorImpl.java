@@ -43,7 +43,6 @@ public class MarkdownEditorImpl implements MarkdownEditor {
     // files
     private final VirtualFile file;
     private final Project project;
-    private final String style;
 
     private final Block EditorText;
 
@@ -57,7 +56,6 @@ public class MarkdownEditorImpl implements MarkdownEditor {
     public MarkdownEditorImpl(Project project, VirtualFile file) {
         this.file = file;
         this.project = project;
-        this.style = readCss();
         this.blockManager = new BlockManager((MarkdownEditor)this);
         this.EditorText = new Block(this.blockManager);
         updateEditor();
@@ -80,11 +78,10 @@ public class MarkdownEditorImpl implements MarkdownEditor {
     }
 
     //VirtualFile Save Function
-    public static void saveVirtualFile(final Project project, final VirtualFile virtualFile) {
+    public void saveVirtualFile(final Project project, final VirtualFile virtualFile) {
         WriteCommandAction.runWriteCommandAction(project, () -> {
             Document document= FileDocumentManager.getInstance().getDocument(virtualFile);
-            if(document!=null)
-            {
+            if(document!=null) {
                 FileDocumentManager.getInstance().saveDocument(document);
             }
         });
@@ -94,7 +91,8 @@ public class MarkdownEditorImpl implements MarkdownEditor {
     private void updateEditor()
     {
         try {
-            EditorText.setText(VfsUtil.loadText(file));
+            String mdFileContent = VfsUtil.loadText(file);
+            blockManager.setBlocks(mdFileContent);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -102,13 +100,13 @@ public class MarkdownEditorImpl implements MarkdownEditor {
     //Editor to Markdown
     private void updateMarkdownFile() {
         ApplicationManager.getApplication().runWriteAction(() ->{
-        try {
-            if (file != null) {
-                VfsUtil.saveText(file, EditorText.getText());
+            try {
+                if (file != null) {
+                    VfsUtil.saveText(file, blockManager.extractFullMd());
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
         });
     }
 
@@ -153,17 +151,7 @@ public class MarkdownEditorImpl implements MarkdownEditor {
         };
     }
 
-    private String readCss(){
-        InputStream cssStream = getClass().getClassLoader().getResourceAsStream("editor/github-markdown-light.css");
-        if(cssStream == null) return "";
 
-        try{
-            String cssContent = new String(cssStream.readAllBytes());
-            return Utils.wrapWithHtmlTag("style", cssContent);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     private void initBlocks() {
         blocks = new LinkedList<>();
@@ -189,11 +177,11 @@ public class MarkdownEditorImpl implements MarkdownEditor {
         //Codes above are example of load file
         //codes below are example of current editor
 
-        Block block = new Block(this.blockManager);
-        block.setContentType("text/html");
-        block.setText(makeHtmlWithCss(Utils.stringToHtml(EditorText.getText())));
-        block.setEditable(true);
-        block.setBackground(Color.WHITE);
+//        Block block = new Block(this.blockManager);
+//        block.setContentType("text/html");
+//        block.setText(makeHtmlWithCss(Utils.stringToHtml(EditorText.getText())));
+//        block.setEditable(true);
+//        block.setBackground(Color.WHITE);
     }
 
     private void initUI(){
@@ -230,10 +218,6 @@ public class MarkdownEditorImpl implements MarkdownEditor {
     @Override
     public @NotNull JComponent getComponent() {
         return scrollPane;
-    }
-
-    private String makeHtmlWithCss(String html){
-        return Utils.wrapWithHtmlTag("html", style + html);
     }
 
     /**
