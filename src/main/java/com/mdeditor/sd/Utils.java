@@ -14,6 +14,11 @@ public class Utils {
         return "<" + tag + ">" + content + "</" + tag + ">";
     }
 
+    /**
+     * returns the html-rendered text
+     * @param str - which is stored in Block, Markdown Text.
+     * @return String that has string of html Rendered text.
+     */
     public static String stringToHtml(String str){
         List<Extension> extensions = Arrays.asList(TablesExtension.create());
         Parser parser = Parser.builder()
@@ -26,7 +31,12 @@ public class Utils {
         return renderer.render(document);
     }
 
-    public int prefix_check(Block block){
+    /**
+     * returns the scope of indext that prefix takes.
+     * @param block - the block that wants to check if it has prefix.
+     * @return - the index that prefix ends. if there is no prefix, returns 0;
+     */
+    public static int prefix_check(Block block){
         String temp = block.getMdText();
         int start = block.getIndent_level() * 2;
         int end = temp.indexOf(" ", start);
