@@ -78,11 +78,10 @@ public class MarkdownEditorImpl implements MarkdownEditor {
     }
 
     //VirtualFile Save Function
-    public static void saveVirtualFile(final Project project, final VirtualFile virtualFile) {
+    public void saveVirtualFile(final Project project, final VirtualFile virtualFile) {
         WriteCommandAction.runWriteCommandAction(project, () -> {
             Document document= FileDocumentManager.getInstance().getDocument(virtualFile);
-            if(document!=null)
-            {
+            if(document!=null) {
                 FileDocumentManager.getInstance().saveDocument(document);
             }
         });
@@ -92,7 +91,8 @@ public class MarkdownEditorImpl implements MarkdownEditor {
     private void updateEditor()
     {
         try {
-            EditorText.setText(VfsUtil.loadText(file));
+            String mdFileContent = VfsUtil.loadText(file);
+            blockManager.setBlocks(mdFileContent);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

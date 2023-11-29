@@ -1,6 +1,9 @@
 package com.mdeditor.sd;
 
 import com.mdeditor.sd.editor.MarkdownEditor;
+import com.vladsch.flexmark.util.ast.Node;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -13,10 +16,6 @@ public class BlockManager {
     public BlockManager(MarkdownEditor mdE) {
         this.blockList = new LinkedList<>();
         this.mdEditor = mdE;
-
-        blockList.add(new SingleLineBlock(this));
-        blockList.get(0).grabFocus();
-        this.blockOnFocus = blockList.get(0);
     }
 
     /**
@@ -104,5 +103,39 @@ public class BlockManager {
             fullMd.append("\n");
         }
         return fullMd.toString();
+    }
+
+    public void setBlocks(String markdownString){
+        blockList.clear();
+        for(Node child : Utils.flexmarkParse(markdownString).getChildren()){
+            Document doc = Jsoup.parse(Utils.flexmarkHtmlRender(child));
+            String tagName = doc.select("body > *").get(0).tagName();
+
+            Block block;
+            if(MultiLine.isMultiLine(tagName)){
+                block = new MultiLineBlock(this, "");
+            }
+            else{
+                block = new SingleLineBlock(this);
+            }
+
+            String markdownText = child.getChars().toString();
+            block.setMdText(markdownText);
+
+            block.renderHTML();
+
+            blockList.add(block);
+        }
+
+        if(blockList.isEmpty()){
+            blockList.add(new SingleLineBlock(this));
+        }
+
+        blockOnFocus = blockList.get(0);
+        blockOnFocus.renderMD();
+        blockOnFocus.grabFocus();
+        blockOnFocus.setCaretPosition(0); // FIXME : initial focus must be in first block
+
+        mdEditor.updateUI();
     }
 }
