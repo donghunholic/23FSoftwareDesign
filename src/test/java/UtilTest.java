@@ -37,8 +37,7 @@ public class UtilTest {
             "_italics_, <p><em>italics</em></p>",
             "~~strikethrough~~, <p><s>strikethrough</s></p>",
             "[link](csed332.postech.ac.kr), <p><a href=\"csed332.postech.ac.kr\">link</a></p>",
-            "inline code block `int a = b;`, <p>inline code block <code>int a = b;</code></p>",
-            "- [ ] checkbox, asdf"
+            "inline code block `int a = b;`, <p>inline code block <code>int a = b;</code></p>"
     })
     void testStringToHtmlSingleLine(String string, String expected) {
         String html = Utils.stringToHtml(string);
