@@ -37,10 +37,33 @@ public class UtilTest {
             "_italics_, <p><em>italics</em></p>",
             "~~strikethrough~~, <p><s>strikethrough</s></p>",
             "[link](csed332.postech.ac.kr), <p><a href=\"csed332.postech.ac.kr\">link</a></p>",
-            "inline code block `int a = b;`, <p>inline code block <code>int a = b;</code></p>"
+            "inline code block `int a = b;`, <p>inline code block <code>int a = b;</code></p>",
+            "- [ ] checkbox, asdf"
     })
     void testStringToHtmlSingleLine(String string, String expected) {
         String html = Utils.stringToHtml(string);
+        String result = Jsoup.parse(html).select(" body > *").get(0).toString();
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void testStringToHtmlSingleLineCheckBoxUnChecked() {
+        String expected = """
+<ul>\s
+ <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled readonly>&nbsp;checkbox</li>\s
+</ul>""";
+        String html = Utils.stringToHtml("- [ ] checkbox");
+        String result = Jsoup.parse(html).select(" body > *").get(0).toString();
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void testStringToHtmlSingleLineCheckBoxChecked() {
+        String expected = """
+<ul>\s
+ <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" checked disabled readonly>&nbsp;checkbox</li>\s
+</ul>""";
+        String html = Utils.stringToHtml("- [x] checkbox");
         String result = Jsoup.parse(html).select(" body > *").get(0).toString();
         assertEquals(expected, result);
     }
