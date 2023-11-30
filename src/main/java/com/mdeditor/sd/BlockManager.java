@@ -60,6 +60,7 @@ public class BlockManager {
             }
             case OUTFOCUS_BLOCK_DOWN -> {
                 if(idx < blockList.size()-1){
+                    MultiBlockParse(idx+1);
                     block.renderHTML();
                     blockList.get(idx+1).requestFocusInWindow();
                     this.blockOnFocus = blockList.get(idx+1);
@@ -109,6 +110,37 @@ public class BlockManager {
             fullMd.append("\n\n");
         }
         return fullMd.toString();
+    }
+
+    /**
+     * parse the block which is at BlockList[idx]
+     * @param idx - the integer of Block's index. Must have value between 0 ~ BlockList.length()
+     */
+    public void MultiBlockParse(int idx){
+        int cur = idx;
+        int nl_idx = 0;
+        Block temp = this.blockList.get(cur);
+        String str = temp.getMdText();
+        String prefix = "";
+        String newStr = "";
+        int prefix_len = 0;
+        if(Utils.prefix_check(temp) != 0){
+            prefix_len = Utils.prefix_check(temp);
+            prefix = str.substring(temp.getIndent_level() * 2, temp.getIndent_level() * 2 + prefix_len);
+        }
+        System.out.println(prefix);
+        while(str.indexOf("\n", nl_idx) != -1 || str.charAt(nl_idx-1 > 0 ? nl_idx - 1 : 0) == '\n'){
+            if(!str.substring(nl_idx, nl_idx + prefix_len).equals(prefix)){
+                newStr = str.substring(nl_idx);
+                SingleLineBlock newBlock = new SingleLineBlock(this);
+                newBlock.setMdText(newStr);
+                blockList.add(cur+1,newBlock);
+                temp.setMdText(str.substring(0,nl_idx));
+                mdEditor.updateUI();
+                break;
+            }
+            nl_idx = str.indexOf("\n", nl_idx) + 1;
+        }
     }
 
     public void setBlocks(String markdownString){
