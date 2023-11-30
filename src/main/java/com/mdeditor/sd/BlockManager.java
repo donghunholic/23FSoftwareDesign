@@ -1,9 +1,13 @@
 package com.mdeditor.sd;
 
+import com.intellij.openapi.editor.Caret;
 import com.mdeditor.sd.editor.MarkdownEditor;
 
+import javax.swing.*;
+import java.awt.*;
 import java.util.LinkedList;
 import java.util.List;
+
 
 public class BlockManager {
     private final List<Block> blockList;
@@ -37,8 +41,9 @@ public class BlockManager {
                 blockList.add(idx+1, newBlock);
 
                 mdEditor.updateUI();
-                newBlock.requestFocusInWindow();
-                //newBlock.renderMD();
+                SwingUtilities.invokeLater(() -> {
+                    newBlock.requestFocusInWindow();
+                });
                 this.blockOnFocus = newBlock;
             }
             case DELETE_BLOCK -> {
@@ -48,7 +53,10 @@ public class BlockManager {
                     blockList.remove(block);
                     block.destruct();
                     mdEditor.updateUI();
-                    newFocusBlock.requestFocusInWindow();
+                    SwingUtilities.invokeLater(() -> {
+                        newFocusBlock.requestFocusInWindow();
+                    });
+
                     this.blockOnFocus = newFocusBlock;
                 }
             }

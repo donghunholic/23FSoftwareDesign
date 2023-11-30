@@ -1,6 +1,8 @@
 package com.mdeditor.sd;
 
 import javax.swing.*;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
@@ -19,11 +21,16 @@ public class Block extends JTextPane {
     public final String indent = "  ";
     private int indent_level;
 
+    //protected int PreCaretPosition;
+    protected int CaretPosition;
+
     public Block(BlockManager manager){
         this.mdText = "";
         this.setEditable(true);
         this.blockManager = manager;
         this.indent_level = 0;
+        //PreCaretPosition=0;
+        CaretPosition=0;
 
 
         this.addMouseListener(new MouseListener() {
@@ -43,6 +50,20 @@ public class Block extends JTextPane {
 
             @Override
             public void mouseExited(MouseEvent e) {  }
+        });
+
+        this.addCaretListener(new CaretListener() {
+            @Override
+            public void caretUpdate(CaretEvent e) {
+                if(e.getDot()==0&&CaretPosition==-1)
+                {
+                    CaretPosition=-1;
+                }
+                else
+                {
+                    CaretPosition=e.getDot();
+                }
+            }
         });
     }
 
