@@ -46,6 +46,28 @@ public class UtilTest {
     }
 
     @Test
+    void testStringToHtmlSingleLineCheckBoxUnChecked() {
+        String expected = """
+<ul>\s
+ <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled readonly>&nbsp;checkbox</li>\s
+</ul>""";
+        String html = Utils.stringToHtml("- [ ] checkbox");
+        String result = Jsoup.parse(html).select(" body > *").get(0).toString();
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void testStringToHtmlSingleLineCheckBoxChecked() {
+        String expected = """
+<ul>\s
+ <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" checked disabled readonly>&nbsp;checkbox</li>\s
+</ul>""";
+        String html = Utils.stringToHtml("- [x] checkbox");
+        String result = Jsoup.parse(html).select(" body > *").get(0).toString();
+        assertEquals(expected, result);
+    }
+
+    @Test
     void testStringToHtmlMultiLineList() {
         String expected = """
 <ul>\s

@@ -1,5 +1,6 @@
 package com.mdeditor.sd;
 import com.vladsch.flexmark.ext.gfm.strikethrough.StrikethroughExtension;
+import com.vladsch.flexmark.ext.gfm.tasklist.TaskListExtension;
 import com.vladsch.flexmark.ext.tables.TablesExtension;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
@@ -21,7 +22,8 @@ public class Utils {
         style = readCss();
         MutableDataSet flexmarkOptions = new MutableDataSet().set(Parser.EXTENSIONS, Arrays.asList(
                         StrikethroughExtension.create(),
-                        TablesExtension.create()
+                        TablesExtension.create(),
+                        TaskListExtension.create()
                 ))
                 .set(TablesExtension.MIN_SEPARATOR_DASHES, 1)
                 .set(StrikethroughExtension.STRIKETHROUGH_STYLE_HTML_OPEN, "<s>")
