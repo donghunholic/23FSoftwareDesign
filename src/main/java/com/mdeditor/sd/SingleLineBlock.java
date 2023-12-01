@@ -18,7 +18,7 @@ public class SingleLineBlock extends Block {
             @Override
             public void keyReleased(KeyEvent e) {
                 if(e.getKeyCode() == KeyEvent.VK_ENTER){
-                    e.consume();
+                    //e.consume();
                     requestManager(BlockEvent.NEW_BLOCK);
                 }
 
