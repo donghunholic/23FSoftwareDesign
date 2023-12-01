@@ -32,6 +32,8 @@ public class BlockManager {
         blockOnFocus.setMdText(blockOnFocus.getText().strip());
 
         switch (e) {
+            case UPDATE_BLOCK -> { }
+
             case NEW_BLOCK -> {
                 String str = block.getMdText().substring(block.getCaretPosition()-1);
                 block.setMdText(block.getMdText().substring(0,block.getCaretPosition()-1));

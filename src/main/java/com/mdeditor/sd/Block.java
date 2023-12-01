@@ -37,6 +37,7 @@ public class Block extends JTextPane {
             @Override
             public void mouseClicked(MouseEvent e) {
                 requestManager(BlockEvent.OUTFOCUS_CLICKED);
+
             }
 
             @Override
@@ -129,5 +130,14 @@ public class Block extends JTextPane {
     public void destruct(){
         mdText = null;
         blockManager = null;
+    }
+
+
+    public void setIndent_level(int level){
+        indent_level = level;
+    }
+
+    public int getIndent_level(){
+        return this.indent_level;
     }
 }
