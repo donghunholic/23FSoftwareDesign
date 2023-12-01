@@ -58,7 +58,9 @@ public class BlockManager {
                     blockList.get(idx).renderHTML();
                     //RenderAll();
                     mdEditor.updateUI();
-                    blockList.get(idx-1).requestFocusInWindow();
+                    SwingUtilities.invokeLater(()->{
+                        blockList.get(idx-1).requestFocusInWindow();
+                    });
                     this.blockOnFocus = blockList.get(idx-1);
 
                 }
@@ -69,7 +71,9 @@ public class BlockManager {
                     blockList.get(idx).renderHTML();
                     //RenderAll();
                     mdEditor.updateUI();
-                    blockList.get(idx+1).requestFocusInWindow();
+                    SwingUtilities.invokeLater(()->{
+                        blockList.get(idx+1).requestFocusInWindow();
+                    });
                     this.blockOnFocus = blockList.get(idx+1);
                 }
             }
@@ -78,8 +82,10 @@ public class BlockManager {
                 blockOnFocus.renderHTML();
                 //block.renderMD();
                 mdEditor.updateUI();
-                blockList.get(0).requestFocusInWindow();
-                blockOnFocus = blockList.get(0);
+                SwingUtilities.invokeLater(()->{
+                    blockList.get(idx).requestFocusInWindow();
+                });
+                blockOnFocus = blockList.get(idx);
             }
             case TRANSFORM_MULTI -> {
                 String temp = block.getMdText();
@@ -138,6 +144,10 @@ public class BlockManager {
         if(Utils.prefix_check(temp) != 0){
             prefix_len = Utils.prefix_check(temp);
             prefix = str.substring(temp.getIndent_level() * 2, temp.getIndent_level() * 2 + prefix_len);
+            blockList.remove(temp);
+            temp = new MultiLineBlock(this, prefix);
+            temp.setMdText(str);
+            blockList.add(cur, temp);
 
             while(str.indexOf("\n", nl_idx) != -1 || is_last_line){
                 if(is_last_line){
@@ -149,11 +159,7 @@ public class BlockManager {
                     MultiLineBlock curBlock = new MultiLineBlock(this, prefix);
                     SingleLineBlock newBlock = new SingleLineBlock(this);
                     newBlock.setMdText(newSingleStr);
-                    //newBlock.renderMD();
-                    //curBlock.renderMD();
                     curBlock.setMdText(newMultiStr);
-                    //newBlock.renderHTML();
-                    //curBlock.renderHTML();
                     blockList.remove(temp);
                     blockList.add(cur, curBlock);
                     blockList.add(cur + 1,newBlock);
@@ -174,13 +180,12 @@ public class BlockManager {
                 newSingleStr = str.substring(0, nl_idx + 1);
                 SingleLineBlock newBlock = new SingleLineBlock(this);
                 newBlock.setMdText(newSingleStr);
-                //newBlock.renderHTML();
-                //newBlock.renderMD();
                 blockList.add(cur,newBlock);
                 temp.setMdText(str.substring(nl_idx+1));
-                //temp.renderHTML();
-                //temp.renderMD();
             }
+        }
+        if(!is_last_line && idx + 1 < blockList.size()){
+            BlockParse(idx+1);
         }
     }
 
