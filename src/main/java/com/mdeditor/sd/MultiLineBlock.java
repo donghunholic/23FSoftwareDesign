@@ -3,7 +3,6 @@ package com.mdeditor.sd;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Arrays;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MultiLineBlock extends Block {
@@ -50,7 +49,7 @@ public class MultiLineBlock extends Block {
 
                     String text = getMdText();
                     int caret = getCaretPosition();
-                    if(caret < text.length() - 1){
+                    if(caret < text.length()){
                         String insertStr = getNewLine();
                         getBlock().setText(text.substring(0,caret) + insertStr + text.substring(caret));
                         setCaretPosition(caret + insertStr.length());
@@ -94,10 +93,8 @@ public class MultiLineBlock extends Block {
     }
 
     private static String getLastLine(String input) {
-        // Split the string into lines
         String[] lines = input.split("\\n");
 
-        // Use Stream API with lambda to get the last line
         return Arrays.stream(lines)
                 .reduce((first, second) -> second)
                 .orElse("");
