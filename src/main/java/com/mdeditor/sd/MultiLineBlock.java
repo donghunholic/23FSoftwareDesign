@@ -2,6 +2,8 @@ package com.mdeditor.sd;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.Arrays;
+import java.util.regex.Pattern;
 
 public class MultiLineBlock extends Block {
     /**
@@ -23,34 +25,84 @@ public class MultiLineBlock extends Block {
             }
 
             @Override
-            public void keyPressed(KeyEvent e) { }
+            public void keyPressed(KeyEvent e) {
+                if(getCaretPosition()==1)
+                {
+                    if(e.getKeyCode() == KeyEvent.VK_LEFT){
+                        CaretPosition=-1;
+                    }
+                }
+                else if(CaretPosition==-1)
+                {
+                    CaretPosition=-1;
+                }
+                else
+                {
+                    CaretPosition=getCaretPosition();
+                }
+            }
 
             @Override
             public void keyReleased(KeyEvent e) {
                 if(e.getKeyCode() == KeyEvent.VK_ENTER){
-                    if(!prefix.isEmpty() && getMdText().substring(getMdText().length()-prefix.length()).equals(prefix)){
-                        requestManager(BlockEvent.NEW_BLOCK);
+                    requestManager(BlockEvent.UPDATE_BLOCK);
+
+                    String text = getMdText();
+                    int caret = getCaretPosition();
+                    if(caret < text.length()){
+                        String insertStr = getNewLine();
+                        getBlock().setText(text.substring(0,caret) + insertStr + text.substring(caret));
+                        setCaretPosition(caret + insertStr.length());
                     }
-                    else {
-                        getBlock().setText(getMdText() + "\n" + prefix);
+                    else{
+                        String curLine = getLastLine(text);
+                        String pattern = "^[ ]*" + Pattern.quote(prefix) + "[ \n]*$";
+                        Pattern regex = Pattern.compile(pattern);
+                        if(regex.matcher(curLine).matches()){
+                            requestManager(BlockEvent.NEW_BLOCK);
+                        }
+                        else{
+                            String insertStr = getNewLine();
+                            getBlock().setText(text + insertStr);
+                            setCaretPosition(caret + insertStr.length());
+                        }
                     }
+
                 }
 
-                else if(e.getKeyCode() == KeyEvent.VK_BACK_SPACE && getCaretPosition() == 0){
-                    requestManager(BlockEvent.DELETE_BLOCK);
+                else if(e.getKeyCode() == KeyEvent.VK_BACK_SPACE){
+                    if(CaretPosition==0)
+                    {
+                        CaretPosition=-1;
+                    }
+                    else if(CaretPosition==-1)
+                    {
+                        requestManager(BlockEvent.DELETE_BLOCK);
+                    }
                 }
 
                 else if(e.getKeyCode() == KeyEvent.VK_UP){
-                    if(getCaretPosition() != 0) setCaretPosition(0);
-                    else requestManager(BlockEvent.OUTFOCUS_BLOCK_UP);
+                    requestManager(BlockEvent.OUTFOCUS_BLOCK_UP);
                 }
 
                 else if(e.getKeyCode() == KeyEvent.VK_DOWN){
-                    if(getCaretPosition() != getMdText().length()) setCaretPosition(getMdText().length());
-                    else requestManager(BlockEvent.OUTFOCUS_BLOCK_DOWN);
+                    requestManager(BlockEvent.OUTFOCUS_BLOCK_DOWN);
                 }
             }
         });
+    }
+
+    private static String getLastLine(String input) {
+        String[] lines = input.split("\\n");
+
+        return Arrays.stream(lines)
+                .reduce((first, second) -> second)
+                .orElse("");
+    }
+
+    private String getNewLine(){
+        return " ".repeat(Math.max(0, getIndent_level() * 2)) +
+                prefix + " ";
     }
 }
 

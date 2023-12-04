@@ -1,13 +1,16 @@
 package com.mdeditor.sd;
 
+import com.intellij.openapi.editor.Caret;
 import com.mdeditor.sd.editor.MarkdownEditor;
 import com.vladsch.flexmark.util.ast.Node;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.LinkedList;
 import java.util.List;
+
 
 public class BlockManager {
     private final List<Block> blockList;
@@ -28,6 +31,8 @@ public class BlockManager {
         blockOnFocus.setMdText(blockOnFocus.getText().strip());
 
         switch (e) {
+            case UPDATE_BLOCK -> { }
+
             case NEW_BLOCK -> {
                 String str = block.getMdText().substring(block.getCaretPosition()-1);
                 block.setMdText(block.getMdText().substring(0,block.getCaretPosition()-1));
@@ -37,8 +42,9 @@ public class BlockManager {
                 blockList.add(idx+1, newBlock);
 
                 mdEditor.updateUI();
-                newBlock.requestFocusInWindow();
-                //newBlock.renderMD();
+                SwingUtilities.invokeLater(() -> {
+                    newBlock.requestFocusInWindow();
+                });
                 this.blockOnFocus = newBlock;
             }
             case DELETE_BLOCK -> {
@@ -48,7 +54,10 @@ public class BlockManager {
                     blockList.remove(block);
                     block.destruct();
                     mdEditor.updateUI();
-                    newFocusBlock.requestFocusInWindow();
+                    SwingUtilities.invokeLater(() -> {
+                        newFocusBlock.requestFocusInWindow();
+                    });
+
                     this.blockOnFocus = newFocusBlock;
                 }
             }
