@@ -90,7 +90,7 @@ public class Block extends JTextPane {
      */
     public void renderHTML(){
         this.setContentType("text/html");
-        this.setText(Utils.stringToHtml(getMdText()));
+        this.setText(Utils.stringToHtmlWithCss(getMdText()));
     }
 
     /**
@@ -131,7 +131,6 @@ public class Block extends JTextPane {
         mdText = null;
         blockManager = null;
     }
-
 
     public void setIndent_level(int level){
         indent_level = level;
