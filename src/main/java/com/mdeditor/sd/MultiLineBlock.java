@@ -1,5 +1,6 @@
 package com.mdeditor.sd;
 
+import javax.swing.text.Element;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Arrays;
@@ -19,6 +20,16 @@ public class MultiLineBlock extends Block {
         super(manager);
         prefix = pre;
         this.addKeyListener(new KeyListener() {
+            /*
+            All of our key listen logic is contained within keyReleased().
+            When obtaining the cursor position with getCaretPosition(),
+            the cursor position is retrieved after release.
+            Therefore, when the up arrow key is pressed while the cursor is on the second line and released,
+            the cursor is on the first line. Therefore, the OUTFOCUS_BLOCK_UP event is called.
+
+            To prevent this, use previousCaretPosition to perform logic based on the caret position when pressing keyPressed().
+             */
+            private int previousCaretPosition = 0;
             @Override
             public void keyTyped(KeyEvent e) {
 
@@ -40,6 +51,8 @@ public class MultiLineBlock extends Block {
                 {
                     CaretPosition=getCaretPosition();
                 }
+
+                previousCaretPosition = getCaretPosition();
             }
 
             @Override
@@ -82,11 +95,15 @@ public class MultiLineBlock extends Block {
                 }
 
                 else if(e.getKeyCode() == KeyEvent.VK_UP){
-                    requestManager(BlockEvent.OUTFOCUS_BLOCK_UP);
+                    if(isCaretInFirstLine(previousCaretPosition)) {
+                        requestManager(BlockEvent.OUTFOCUS_BLOCK_UP);
+                    }
                 }
 
                 else if(e.getKeyCode() == KeyEvent.VK_DOWN){
-                    requestManager(BlockEvent.OUTFOCUS_BLOCK_DOWN);
+                    if(isCaretInLastLine(previousCaretPosition)){
+                        requestManager(BlockEvent.OUTFOCUS_BLOCK_DOWN);
+                    }
                 }
             }
         });
@@ -103,6 +120,21 @@ public class MultiLineBlock extends Block {
     private String getNewLine(){
         return " ".repeat(Math.max(0, getIndent_level() * 2)) +
                 prefix + " ";
+    }
+
+    private boolean isCaretInFirstLine(int caretPosition){
+        Element root = this.getDocument().getDefaultRootElement();
+        int line = root.getElementIndex(caretPosition);
+
+        return line == 0;
+    }
+
+    public boolean isCaretInLastLine(int caretPosition) {
+        Element root = this.getDocument().getDefaultRootElement();
+        int line = root.getElementIndex(caretPosition);
+        int lastLine = root.getElementCount() - 1;
+
+        return line == lastLine;
     }
 }
 
