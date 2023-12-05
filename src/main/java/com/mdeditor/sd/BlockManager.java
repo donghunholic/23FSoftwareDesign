@@ -40,11 +40,6 @@ public class BlockManager {
                 SingleLineBlock newBlock = new SingleLineBlock(this);
                 newBlock.setMdText(str);
                 blockList.add(idx+1, newBlock);
-
-                mdEditor.updateUI();
-                SwingUtilities.invokeLater(() -> {
-                    newBlock.requestFocusInWindow();
-                });
                 this.blockOnFocus = newBlock;
             }
             case DELETE_BLOCK -> {
@@ -53,11 +48,6 @@ public class BlockManager {
                     newFocusBlock.setMdText(newFocusBlock.getMdText() + block.getMdText());
                     blockList.remove(block);
                     block.destruct();
-                    mdEditor.updateUI();
-                    SwingUtilities.invokeLater(() -> {
-                        newFocusBlock.requestFocusInWindow();
-                    });
-
                     this.blockOnFocus = newFocusBlock;
                 }
             }
@@ -65,11 +55,6 @@ public class BlockManager {
                 if(idx > 0){
                     BlockParse(idx);
                     blockList.get(idx).renderHTML();
-                    //RenderAll();
-                    mdEditor.updateUI();
-                    SwingUtilities.invokeLater(()->{
-                        blockList.get(idx-1).requestFocusInWindow();
-                    });
                     this.blockOnFocus = blockList.get(idx-1);
 
                 }
@@ -78,22 +63,12 @@ public class BlockManager {
                 if(idx < blockList.size()-1){
                     BlockParse(idx);
                     blockList.get(idx).renderHTML();
-                    //RenderAll();
-                    mdEditor.updateUI();
-                    SwingUtilities.invokeLater(()->{
-                        blockList.get(idx+1).requestFocusInWindow();
-                    });
                     this.blockOnFocus = blockList.get(idx+1);
                 }
             }
             case OUTFOCUS_CLICKED ->{
                 BlockParse(idx);
                 blockOnFocus.renderHTML();
-                //block.renderMD();
-                mdEditor.updateUI();
-                SwingUtilities.invokeLater(()->{
-                    blockList.get(idx).requestFocusInWindow();
-                });
                 blockOnFocus = blockList.get(idx);
             }
             case TRANSFORM_MULTI -> {
@@ -111,6 +86,7 @@ public class BlockManager {
             }
             default -> { throw new IllegalStateException("Unexpected value: " + e); }
         }
+        renderAll();
     }
 
     public List<Block> getBlockList(){
@@ -232,9 +208,19 @@ public class BlockManager {
         mdEditor.updateUI();
     }
 
-    public void RenderAll(){
-        for(int i = 0; i < blockList.size(); i++){
-            blockList.get(i).renderHTML();
+    public void renderAll(){
+        for(Block b : blockList){
+            if(b.getContentType() .equals( "text/html")){
+
+            }
+            else{ // md
+                b.renderHTML();
+            }
         }
+        mdEditor.updateUI();
+        SwingUtilities.invokeLater(()->{
+            blockOnFocus.requestFocusInWindow();
+        });
+
     }
 }
