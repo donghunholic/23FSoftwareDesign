@@ -6,6 +6,8 @@ import java.util.Arrays;
 import java.util.regex.Pattern;
 
 public class MultiLineBlock extends Block {
+    MultiLine type;
+
     /**
      * quote: >
      * checkbox: []
@@ -103,6 +105,14 @@ public class MultiLineBlock extends Block {
     private String getNewLine(){
         return " ".repeat(Math.max(0, getIndent_level() * 2)) +
                 prefix + " ";
+    }
+
+    public void setType(MultiLine type) {
+        this.type = type;
+    }
+
+    public MultiLine getType() {
+        return type;
     }
 }
 
