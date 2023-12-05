@@ -89,16 +89,20 @@ public class Block extends JTextPane {
      * using Utils.stringToHtml()
      */
     public void renderHTML(){
-        this.setContentType("text/html");
-        this.setText(Utils.stringToHtmlWithCss(getMdText()));
+        if(!this.getContentType().equals("text/html")){
+            this.setContentType("text/html");
+            this.setText(Utils.stringToHtmlWithCss(getMdText()));
+        }
     }
 
     /**
      * Set block's jTextPane to mdText
      */
     public void renderMD(){
-        this.setContentType("text/plain");
-        this.setText(mdText);
+        if(!this.getContentType().equals("text/plain")){
+            this.setContentType("text/plain");
+            this.setText(mdText);
+        }
     }
 
     public Block getBlock(){
