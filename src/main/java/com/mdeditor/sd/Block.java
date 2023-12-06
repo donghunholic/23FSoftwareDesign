@@ -3,8 +3,6 @@ package com.mdeditor.sd;
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -89,20 +87,16 @@ public class Block extends JTextPane {
      * using Utils.stringToHtml()
      */
     public void renderHTML(){
-        if(!this.getContentType().equals("text/html")){
-            this.setContentType("text/html");
-            this.setText(Utils.stringToHtmlWithCss(getMdText()));
-        }
+        this.setContentType("text/html");
+        this.setText(Utils.stringToHtmlWithCss(getMdText()));
     }
 
     /**
      * Set block's jTextPane to mdText
      */
     public void renderMD(){
-        if(!this.getContentType().equals("text/plain")){
-            this.setContentType("text/plain");
-            this.setText(mdText);
-        }
+        this.setContentType("text/plain");
+        this.setText(mdText);
     }
 
     public Block getBlock(){
