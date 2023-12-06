@@ -9,6 +9,7 @@ import org.jsoup.nodes.Document;
 import javax.swing.*;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 
 public class BlockManager {
@@ -52,7 +53,7 @@ public class BlockManager {
             }
             case OUTFOCUS_BLOCK_UP -> {
                 if(idx > 0){
-                    BlockParse(idx);
+                    manageBlock(idx);
                     blockList.get(idx).renderHTML();
                     this.blockOnFocus = blockList.get(idx-1);
 
@@ -60,13 +61,13 @@ public class BlockManager {
             }
             case OUTFOCUS_BLOCK_DOWN -> {
                 if(idx < blockList.size()-1){
-                    BlockParse(idx);
+                    manageBlock(idx);
                     blockList.get(idx).renderHTML();
                     this.blockOnFocus = blockList.get(idx+1);
                 }
             }
             case OUTFOCUS_CLICKED ->{
-                BlockParse(idx);
+                manageBlock(idx);
                 blockOnFocus.renderHTML();
                 blockOnFocus = blockList.get(idx);
             }
@@ -247,5 +248,38 @@ public class BlockManager {
             blockOnFocus.requestFocusInWindow();
         });
 
+    }
+
+    public void mergeBlock(int idx){
+        int cur_idx = idx;
+        Block cur, up, down;
+        if(idx > 0){
+            cur = blockList.get(cur_idx);
+            up = blockList.get(cur_idx - 1);
+            if(cur instanceof MultiLineBlock && up instanceof MultiLineBlock){
+                if(Objects.equals(((MultiLineBlock) cur).prefix, ((MultiLineBlock) up).prefix)){
+                    up.setMdText(up.getMdText() + "\n" + cur.getMdText());
+                    blockList.remove(cur);
+                    cur_idx--;
+                    mergeBlock(cur_idx);
+                }
+            }
+        }
+        if(idx < blockList.size()){
+            cur = blockList.get(cur_idx);
+            down = blockList.get(cur_idx + 1);
+            if(cur instanceof MultiLineBlock && down instanceof MultiLineBlock){
+                if(Objects.equals(((MultiLineBlock) cur).prefix, ((MultiLineBlock) down).prefix)){
+                    cur.setMdText(cur.getMdText() + "\n" + down.getMdText());
+                    blockList.remove(down);
+                    mergeBlock(cur_idx);
+                }
+            }
+        }
+    }
+
+    public void manageBlock(int idx){
+        BlockParse(idx);
+        mergeBlock(idx);
     }
 }
