@@ -29,7 +29,7 @@ public class BlockManager {
         blockOnFocus.setMdText(blockOnFocus.getText().strip());
 
         switch (e) {
-            case UPDATE_BLOCK -> { }
+            case UPDATE_BLOCK -> { return; }
 
             case NEW_BLOCK -> {
                 String str = block.getMdText().substring(block.getCaretPosition()-1);
