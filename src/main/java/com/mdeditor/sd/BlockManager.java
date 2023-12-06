@@ -66,9 +66,11 @@ public class BlockManager {
                 }
             }
             case OUTFOCUS_CLICKED ->{
-                BlockParse(idx);
-                blockOnFocus.renderHTML();
-                blockOnFocus = blockList.get(idx);
+                if(blockOnFocus != blockList.get(idx)){
+                    BlockParse(idx);
+                    blockOnFocus.renderHTML();
+                    blockOnFocus = blockList.get(idx);
+                }
             }
             case TRANSFORM_MULTI -> {
                 String temp = block.getMdText();
@@ -236,9 +238,9 @@ public class BlockManager {
     }
 
     public void renderAll(){
-        for(Block b : blockList){
-            if(!b.getContentType().equals("text/html")){
-                b.renderHTML();
+        for(Block block : blockList){
+            if(block != blockOnFocus && !block.getContentType().equals("text/html")){
+                block.renderHTML();
             }
         }
 
