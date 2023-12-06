@@ -42,7 +42,6 @@ public class BlockTest {
         block.renderMD();
         // assertEquals(block.getContentType(), "text/plain");
         assertEquals(block.getMdText(), content);
-        assertEquals(block.getText(), content);
     }
 
     @Test

@@ -6,6 +6,7 @@ public enum MultiLine {
     BLOCK_QUOTE("blockquote"),
     CODE_BLOCK("pre"),
     TABLE("table"),
+    NONE("")
 
     ;
 
@@ -20,11 +21,15 @@ public enum MultiLine {
     }
 
     public static Boolean isMultiLine(String input){
-        for(MultiLine multiLine : values()){
-            if(multiLine.getTag().equalsIgnoreCase(input)){
-                return true;
+        return fromString(input) != NONE;
+    }
+
+    public static MultiLine fromString(String tag) {
+        for (MultiLine multiLine : MultiLine.values()) {
+            if (multiLine.tag.equals(tag)) {
+                return multiLine;
             }
         }
-        return false;
+        return NONE;
     }
 }

@@ -2,6 +2,7 @@ package com.mdeditor.sd;
 
 import com.mdeditor.sd.editor.MarkdownEditor;
 import com.vladsch.flexmark.util.ast.Node;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -11,7 +12,7 @@ import java.util.List;
 
 
 public class BlockManager {
-    private final List<Block> blockList;
+    private List<Block> blockList;
     private final MarkdownEditor mdEditor;
     private Block blockOnFocus;
 
@@ -65,9 +66,11 @@ public class BlockManager {
                 }
             }
             case OUTFOCUS_CLICKED ->{
-                BlockParse(idx);
-                blockOnFocus.renderHTML();
-                blockOnFocus = blockList.get(idx);
+                if(blockOnFocus != blockList.get(idx)){
+                    BlockParse(idx);
+                    blockOnFocus.renderHTML();
+                    blockOnFocus = blockList.get(idx);
+                }
             }
             case TRANSFORM_MULTI -> {
                 String temp = block.getMdText();
@@ -174,28 +177,14 @@ public class BlockManager {
 
     public void setBlocks(String markdownString){
         blockList.clear();
-        for(Node child : Utils.flexmarkParse(markdownString).getChildren()){
-            Document doc = Jsoup.parse(Utils.flexmarkHtmlRender(child));
-            String tagName = doc.select("body > *").get(0).tagName();
-
-            Block block;
-            if(MultiLine.isMultiLine(tagName)){
-                block = new MultiLineBlock(this, "");
-            }
-            else{
-                block = new SingleLineBlock(this);
-            }
-
-            String markdownText = child.getChars().toString();
-            block.setMdText(markdownText);
-
-            block.renderHTML();
-
-            blockList.add(block);
-        }
+        blockList = parseStringIntoBlocks(markdownString);
 
         if(blockList.isEmpty()){
             blockList.add(new SingleLineBlock(this));
+        }
+
+        for(Block block : blockList){
+            block.renderHTML();
         }
 
         blockOnFocus = blockList.get(0);
@@ -207,12 +196,83 @@ public class BlockManager {
     }
 
     public void renderAll(){
-        for(Block b : blockList){
-            if(b.getContentType().equals("text/html")) { }
-            else b.renderHTML();
+        for(Block block : blockList){
+            if(block != blockOnFocus && !block.getContentType().equals("text/html")){
+                block.renderHTML();
+            }
         }
+
         mdEditor.updateUI();
         SwingUtilities.invokeLater(()-> blockOnFocus.requestFocusInWindow());
+    }
 
+    /**
+     * @param markdownString : markdown string to parse into blocks.
+     * @return list of Blockk, which contains only mdText.
+     */
+    public List<Block> parseStringIntoBlocks(String markdownString){
+        List<Block> blocks = new LinkedList<>();
+        for(Node child : Utils.flexmarkParse(markdownString).getChildren()){
+            Document doc = Jsoup.parse(Utils.flexmarkHtmlRender(child));
+            String tagName = doc.select("body > *").get(0).tagName();
+
+            Block block;
+            if(MultiLine.isMultiLine(tagName)){
+                block = new MultiLineBlock(this, "");
+                ((MultiLineBlock) block).setType(MultiLine.fromString(tagName));
+            }
+            else{
+                block = new SingleLineBlock(this);
+            }
+
+            String markdownText = child.getChars().toString();
+            block.setMdText(markdownText);
+
+            blocks.add(block);
+        }
+
+        return blocks;
+    }
+
+    /**/
+    public Pair<Integer, Integer> getTableIndexFromMarkdownString(String markdownString){
+        List<Block> blocks = parseStringIntoBlocks(markdownString);
+        for(Block block : blocks){
+            if(block instanceof MultiLineBlock && ((MultiLineBlock) block).getType() == MultiLine.TABLE){
+                Integer startIndex = markdownString.indexOf(block.getMdText());
+                Integer endIndex = startIndex + block.getMdText().length() - 1;
+                return Pair.of(startIndex, endIndex);
+            }
+        }
+        return Pair.of(-1, -1);
+    }
+
+
+    /**
+     * @param markdownString : markdown string to parse into blocks.
+     * @return list of Blockk, which contains only mdText.
+     */
+    public List<Block> parseStringIntoBlocks(String markdownString){
+        List<Block> blocks = new LinkedList<>();
+        for(Node child : Utils.flexmarkParse(markdownString).getChildren()){
+            Document doc = Jsoup.parse(Utils.flexmarkHtmlRender(child));
+            String tagName = doc.select("body > *").get(0).tagName();
+
+            Block block;
+            if(MultiLine.isMultiLine(tagName)){
+                block = new MultiLineBlock(this, "");
+                ((MultiLineBlock) block).setType(MultiLine.fromString(tagName));
+            }
+            else{
+                block = new SingleLineBlock(this);
+            }
+
+            String markdownText = child.getChars().toString();
+            block.setMdText(markdownText);
+
+            blocks.add(block);
+        }
+
+        return blocks;
     }
 }
