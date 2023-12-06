@@ -206,34 +206,6 @@ public class BlockManager {
         SwingUtilities.invokeLater(()-> blockOnFocus.requestFocusInWindow());
     }
 
-    /**
-     * @param markdownString : markdown string to parse into blocks.
-     * @return list of Blockk, which contains only mdText.
-     */
-    public List<Block> parseStringIntoBlocks(String markdownString){
-        List<Block> blocks = new LinkedList<>();
-        for(Node child : Utils.flexmarkParse(markdownString).getChildren()){
-            Document doc = Jsoup.parse(Utils.flexmarkHtmlRender(child));
-            String tagName = doc.select("body > *").get(0).tagName();
-
-            Block block;
-            if(MultiLine.isMultiLine(tagName)){
-                block = new MultiLineBlock(this, "");
-                ((MultiLineBlock) block).setType(MultiLine.fromString(tagName));
-            }
-            else{
-                block = new SingleLineBlock(this);
-            }
-
-            String markdownText = child.getChars().toString();
-            block.setMdText(markdownText);
-
-            blocks.add(block);
-        }
-
-        return blocks;
-    }
-
     /**/
     public Pair<Integer, Integer> getTableIndexFromMarkdownString(String markdownString){
         List<Block> blocks = parseStringIntoBlocks(markdownString);

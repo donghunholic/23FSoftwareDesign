@@ -165,7 +165,6 @@ public class MultiLineBlock extends Block {
 
         return line == lastLine;
     }
-}
 
     private boolean isFirstLine(){
         return getText().indexOf('\n') >= getCaretPosition();
