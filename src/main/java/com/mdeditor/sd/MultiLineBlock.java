@@ -55,6 +55,17 @@ public class MultiLineBlock extends Block {
                     CaretPosition=getCaretPosition();
                 }
 
+                if(e.getKeyCode() == KeyEvent.VK_ENTER){
+                    e.consume();
+                }
+                else if(e.getKeyCode() == KeyEvent.VK_UP && isFirstLine()){
+                    requestManager(BlockEvent.OUTFOCUS_BLOCK_UP);
+                }
+
+                else if(e.getKeyCode() == KeyEvent.VK_DOWN && isLastLine()){
+                    requestManager(BlockEvent.OUTFOCUS_BLOCK_DOWN);
+                }
+
                 previousCaretPosition = getCaretPosition();
             }
 
@@ -65,6 +76,12 @@ public class MultiLineBlock extends Block {
 
                     String text = getMdText();
                     int caret = getCaretPosition();
+
+                    if(caret > text.length()){
+                        caret = text.length();
+                        text = text.stripTrailing();
+                    }
+
                     if(caret < text.length()){
                         String insertStr = getNewLine();
                         getBlock().setText(text.substring(0,caret) + insertStr + text.substring(caret));
@@ -72,9 +89,10 @@ public class MultiLineBlock extends Block {
                     }
                     else{
                         String curLine = getLastLine(text);
-                        String pattern = "^[ ]*" + Pattern.quote(prefix) + "[ \n]*$";
+                        String pattern = "^[ ]*" + Pattern.quote(prefix) + "?[\n]*$";
                         Pattern regex = Pattern.compile(pattern);
                         if(regex.matcher(curLine).matches()){
+                            getBlock().setText(text + "\n");
                             requestManager(BlockEvent.NEW_BLOCK);
                         }
                         else{
@@ -113,7 +131,7 @@ public class MultiLineBlock extends Block {
     }
 
     private static String getLastLine(String input) {
-        String[] lines = input.split("\\n");
+        String[] lines = input.split("\n");
 
         return Arrays.stream(lines)
                 .reduce((first, second) -> second)
@@ -121,7 +139,7 @@ public class MultiLineBlock extends Block {
     }
 
     private String getNewLine(){
-        return " ".repeat(Math.max(0, getIndent_level() * 2)) +
+        return  "\n" + " ".repeat(Math.max(0, getIndent_level() * 2)) +
                 prefix + " ";
     }
 
@@ -149,3 +167,11 @@ public class MultiLineBlock extends Block {
     }
 }
 
+    private boolean isFirstLine(){
+        return getText().indexOf('\n') >= getCaretPosition();
+    }
+
+    private boolean isLastLine(){
+        return getText().lastIndexOf('\n') < getCaretPosition();
+    }
+}

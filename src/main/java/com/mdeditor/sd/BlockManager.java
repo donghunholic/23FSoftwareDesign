@@ -30,7 +30,7 @@ public class BlockManager {
         blockOnFocus.setMdText(blockOnFocus.getText().strip());
 
         switch (e) {
-            case UPDATE_BLOCK -> { }
+            case UPDATE_BLOCK -> { return; }
 
             case NEW_BLOCK -> {
                 String str = block.getMdText().substring(block.getCaretPosition()-1);
@@ -189,10 +189,21 @@ public class BlockManager {
 
         blockOnFocus = blockList.get(0);
         blockOnFocus.renderMD();
-        blockOnFocus.grabFocus();
-        blockOnFocus.setCaretPosition(0); // FIXME : initial focus must be in first block
 
         mdEditor.updateUI();
+        SwingUtilities.invokeLater(()-> blockOnFocus.requestFocusInWindow());
+        blockOnFocus.setCaretPosition(0);
+    }
+
+    public void renderAll(){
+        for(Block block : blockList){
+            if(block != blockOnFocus && !block.getContentType().equals("text/html")){
+                block.renderHTML();
+            }
+        }
+
+        mdEditor.updateUI();
+        SwingUtilities.invokeLater(()-> blockOnFocus.requestFocusInWindow());
     }
 
     /**
@@ -233,21 +244,35 @@ public class BlockManager {
                 return Pair.of(startIndex, endIndex);
             }
         }
-
         return Pair.of(-1, -1);
     }
 
-    public void renderAll(){
-        for(Block block : blockList){
-            if(block != blockOnFocus && !block.getContentType().equals("text/html")){
-                block.renderHTML();
+
+    /**
+     * @param markdownString : markdown string to parse into blocks.
+     * @return list of Blockk, which contains only mdText.
+     */
+    public List<Block> parseStringIntoBlocks(String markdownString){
+        List<Block> blocks = new LinkedList<>();
+        for(Node child : Utils.flexmarkParse(markdownString).getChildren()){
+            Document doc = Jsoup.parse(Utils.flexmarkHtmlRender(child));
+            String tagName = doc.select("body > *").get(0).tagName();
+
+            Block block;
+            if(MultiLine.isMultiLine(tagName)){
+                block = new MultiLineBlock(this, "");
+                ((MultiLineBlock) block).setType(MultiLine.fromString(tagName));
             }
+            else{
+                block = new SingleLineBlock(this);
+            }
+
+            String markdownText = child.getChars().toString();
+            block.setMdText(markdownText);
+
+            blocks.add(block);
         }
 
-        mdEditor.updateUI();
-        SwingUtilities.invokeLater(()->{
-            blockOnFocus.requestFocusInWindow();
-        });
-
+        return blocks;
     }
 }
