@@ -66,9 +66,11 @@ public class BlockManager {
                 }
             }
             case OUTFOCUS_CLICKED ->{
-                BlockParse(idx);
-                blockOnFocus.renderHTML();
-                blockOnFocus = blockList.get(idx);
+                if(blockOnFocus != blockList.get(idx)){
+                    BlockParse(idx);
+                    blockOnFocus.renderHTML();
+                    blockOnFocus = blockList.get(idx);
+                }
             }
             case TRANSFORM_MULTI -> {
                 String temp = block.getMdText();
