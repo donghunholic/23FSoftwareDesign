@@ -1,13 +1,11 @@
 package com.mdeditor.sd;
 
-import com.intellij.openapi.editor.Caret;
 import com.mdeditor.sd.editor.MarkdownEditor;
 import com.vladsch.flexmark.util.ast.Node;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -202,25 +200,19 @@ public class BlockManager {
 
         blockOnFocus = blockList.get(0);
         blockOnFocus.renderMD();
-        blockOnFocus.grabFocus();
-        blockOnFocus.setCaretPosition(0); // FIXME : initial focus must be in first block
 
         mdEditor.updateUI();
+        SwingUtilities.invokeLater(()-> blockOnFocus.requestFocusInWindow());
+        blockOnFocus.setCaretPosition(0);
     }
 
     public void renderAll(){
         for(Block b : blockList){
-            if(b.getContentType() .equals( "text/html")){
-
-            }
-            else{ // md
-                b.renderHTML();
-            }
+            if(b.getContentType().equals("text/html")) { }
+            else b.renderHTML();
         }
         mdEditor.updateUI();
-        SwingUtilities.invokeLater(()->{
-            blockOnFocus.requestFocusInWindow();
-        });
+        SwingUtilities.invokeLater(()-> blockOnFocus.requestFocusInWindow());
 
     }
 }
