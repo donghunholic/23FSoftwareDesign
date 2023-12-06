@@ -238,9 +238,9 @@ public class BlockManager {
     }
 
     public void renderAll(){
-        for(Block b : blockList){
-            if(!b.getContentType().equals("text/html")){
-                b.renderHTML();
+        for(Block block : blockList){
+            if(block != blockOnFocus && !block.getContentType().equals("text/html")){
+                block.renderHTML();
             }
         }
 
