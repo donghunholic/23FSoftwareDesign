@@ -31,8 +31,6 @@ public class MultiLineBlock extends Block {
 
             To prevent this, use previousCaretPosition to perform logic based on the caret position when pressing keyPressed().
              */
-            private int previousCaretPosition = 0;
-
             @Override
             public void keyTyped(KeyEvent e) {
 
@@ -65,8 +63,6 @@ public class MultiLineBlock extends Block {
                 else if(e.getKeyCode() == KeyEvent.VK_DOWN && isLastLine()){
                     requestManager(BlockEvent.OUTFOCUS_BLOCK_DOWN);
                 }
-
-                previousCaretPosition = getCaretPosition();
             }
 
             @Override
@@ -114,18 +110,6 @@ public class MultiLineBlock extends Block {
                         requestManager(BlockEvent.DELETE_BLOCK);
                     }
                 }
-
-                else if(e.getKeyCode() == KeyEvent.VK_UP){
-                    if(isCaretInFirstLine(previousCaretPosition)) {
-                        requestManager(BlockEvent.OUTFOCUS_BLOCK_UP);
-                    }
-                }
-
-                else if(e.getKeyCode() == KeyEvent.VK_DOWN){
-                    if(isCaretInLastLine(previousCaretPosition)){
-                        requestManager(BlockEvent.OUTFOCUS_BLOCK_DOWN);
-                    }
-                }
             }
         });
     }
@@ -151,23 +135,12 @@ public class MultiLineBlock extends Block {
         return type;
     }
 
-    private boolean isCaretInFirstLine(int caretPosition){
-        Element root = this.getDocument().getDefaultRootElement();
-        int line = root.getElementIndex(caretPosition);
-
-        return line == 0;
-    }
-
-    public boolean isCaretInLastLine(int caretPosition) {
-        Element root = this.getDocument().getDefaultRootElement();
-        int line = root.getElementIndex(caretPosition);
-        int lastLine = root.getElementCount() - 1;
-
-        return line == lastLine;
-    }
-
     private boolean isFirstLine(){
-        return getText().indexOf('\n') >= getCaretPosition();
+        int pos = getText().indexOf('\n');
+        if( pos == -1){
+            return true;
+        }
+        return pos >= getCaretPosition();
     }
 
     private boolean isLastLine(){
