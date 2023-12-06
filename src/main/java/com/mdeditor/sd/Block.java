@@ -95,8 +95,10 @@ public class Block extends JTextPane {
      * Set block's jTextPane to mdText
      */
     public void renderMD(){
-        this.setContentType("text/plain");
-        this.setText(mdText);
+        if(!this.getContentType().equals("text/plain")){
+            this.setContentType("text/plain");
+            this.setText(mdText);
+        }
     }
 
     public Block getBlock(){
