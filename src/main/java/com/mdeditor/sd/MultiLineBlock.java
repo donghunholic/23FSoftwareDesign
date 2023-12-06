@@ -44,6 +44,13 @@ public class MultiLineBlock extends Block {
                 if(e.getKeyCode() == KeyEvent.VK_ENTER){
                     e.consume();
                 }
+                else if(e.getKeyCode() == KeyEvent.VK_UP && isFirstLine()){
+                    requestManager(BlockEvent.OUTFOCUS_BLOCK_UP);
+                }
+
+                else if(e.getKeyCode() == KeyEvent.VK_DOWN && isLastLine()){
+                    requestManager(BlockEvent.OUTFOCUS_BLOCK_DOWN);
+                }
             }
 
             @Override
@@ -91,14 +98,6 @@ public class MultiLineBlock extends Block {
                         requestManager(BlockEvent.DELETE_BLOCK);
                     }
                 }
-
-                else if(e.getKeyCode() == KeyEvent.VK_UP){
-                    requestManager(BlockEvent.OUTFOCUS_BLOCK_UP);
-                }
-
-                else if(e.getKeyCode() == KeyEvent.VK_DOWN){
-                    requestManager(BlockEvent.OUTFOCUS_BLOCK_DOWN);
-                }
             }
         });
     }
@@ -115,5 +114,12 @@ public class MultiLineBlock extends Block {
         return  "\n" + " ".repeat(Math.max(0, getIndent_level() * 2)) +
                 prefix + " ";
     }
-}
 
+    private boolean isFirstLine(){
+        return getText().indexOf('\n') >= getCaretPosition();
+    }
+
+    private boolean isLastLine(){
+        return getText().lastIndexOf('\n') < getCaretPosition();
+    }
+}
