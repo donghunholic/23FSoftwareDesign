@@ -95,10 +95,15 @@ public class Block extends JTextPane {
      * Set block's jTextPane to mdText
      */
     public void renderMD(){
-        if(!this.getContentType().equals("text/plain")){
-            this.setContentType("text/plain");
-            this.setText(mdText);
+        int caretPosition = this.getCaretPosition();
+
+        this.setContentType("text/plain");
+        this.setText(mdText);
+
+        if(this.getText().length() < caretPosition){
+            caretPosition = this.getText().length() - 1;
         }
+        this.setCaretPosition(caretPosition);
     }
 
     public Block getBlock(){
