@@ -25,9 +25,11 @@ public class BlockManager {
      * Handle Focus event
      * Block is created or deleted, request update to MarkdownEditor
      */
-    public void update(Block block, BlockEvent e) {
+    public void update(Block block, BlockEvent e, int pos) {
         int idx = blockList.indexOf(block);
         blockOnFocus.setMdText(blockOnFocus.getText().strip());
+
+        int caretPos = pos;
 
         switch (e) {
             case UPDATE_BLOCK -> { return; }
@@ -44,6 +46,7 @@ public class BlockManager {
             case DELETE_BLOCK -> {
                 if(idx > 0){
                     Block newFocusBlock = blockList.get(idx-1);
+                    caretPos = newFocusBlock.getMdText().length();
                     newFocusBlock.setMdText(newFocusBlock.getMdText() + block.getMdText());
                     blockList.remove(block);
                     block.destruct();
@@ -55,7 +58,7 @@ public class BlockManager {
                     BlockParse(idx);
                     blockList.get(idx).renderHTML();
                     this.blockOnFocus = blockList.get(idx-1);
-
+                    caretPos = Math.max(0, blockOnFocus.getMdText().lastIndexOf('\n')) + pos;
                 }
             }
             case OUTFOCUS_BLOCK_DOWN -> {
@@ -87,7 +90,7 @@ public class BlockManager {
             }
             default -> { throw new IllegalStateException("Unexpected value: " + e); }
         }
-        renderAll();
+        renderAll(caretPos);
     }
 
     public List<Block> getBlockList(){
@@ -191,11 +194,14 @@ public class BlockManager {
         blockOnFocus.renderMD();
 
         mdEditor.updateUI();
-        SwingUtilities.invokeLater(()-> blockOnFocus.requestFocusInWindow());
-        blockOnFocus.setCaretPosition(0);
+        SwingUtilities.invokeLater(()->{
+            blockOnFocus.requestFocusInWindow();
+            blockOnFocus.setCaretPosition(0);
+        });
+
     }
 
-    public void renderAll(){
+    public void renderAll(int caretPos){
         for(Block block : blockList){
             if(block != blockOnFocus && !block.getContentType().equals("text/html")){
                 block.renderHTML();
@@ -203,7 +209,13 @@ public class BlockManager {
         }
 
         mdEditor.updateUI();
-        SwingUtilities.invokeLater(()-> blockOnFocus.requestFocusInWindow());
+
+        int pos = caretPos == -1 || caretPos > blockOnFocus.getMdText().length() ?
+                blockOnFocus.getMdText().length() : Math.max(0, caretPos);
+        SwingUtilities.invokeLater(()->{
+            blockOnFocus.requestFocusInWindow();
+            blockOnFocus.setCaretPosition(pos);
+        });
     }
 
     /**/

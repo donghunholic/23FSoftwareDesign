@@ -36,7 +36,7 @@ public class SingleLineBlock extends Block {
             @Override
             public void keyReleased(KeyEvent e) {
                 if(e.getKeyCode() == KeyEvent.VK_ENTER){
-                    requestManager(BlockEvent.NEW_BLOCK);
+                    requestManager(BlockEvent.NEW_BLOCK, 0);
                 }
 
                 else if(e.getKeyCode() == KeyEvent.VK_BACK_SPACE){
@@ -46,16 +46,16 @@ public class SingleLineBlock extends Block {
                     }
                     else if(CaretPosition==-1)
                     {
-                        requestManager(BlockEvent.DELETE_BLOCK);
+                        requestManager(BlockEvent.DELETE_BLOCK, -1);
                     }
                 }
 
                 else if(e.getKeyCode() == KeyEvent.VK_UP){
-                    requestManager(BlockEvent.OUTFOCUS_BLOCK_UP);
+                    requestManager(BlockEvent.OUTFOCUS_BLOCK_UP, getCaretPosition());
                 }
 
                 else if(e.getKeyCode() == KeyEvent.VK_DOWN){
-                    requestManager(BlockEvent.OUTFOCUS_BLOCK_DOWN);
+                    requestManager(BlockEvent.OUTFOCUS_BLOCK_DOWN, getCaretPosition());
                 }
             }
 

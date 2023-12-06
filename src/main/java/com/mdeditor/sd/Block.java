@@ -34,7 +34,7 @@ public class Block extends JTextPane {
         this.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                requestManager(BlockEvent.OUTFOCUS_CLICKED);
+                requestManager(BlockEvent.OUTFOCUS_CLICKED, getCaretPosition());
 
             }
 
@@ -113,8 +113,8 @@ public class Block extends JTextPane {
      * Requests blockManager to handle BlockEvents by keyListener
      * @param e - See BlockEvent.java
      */
-    public void requestManager(BlockEvent e){
-        blockManager.update(this, e);
+    public void requestManager(BlockEvent e, int pos){
+        blockManager.update(this, e, pos);
     }
 
     @Override
