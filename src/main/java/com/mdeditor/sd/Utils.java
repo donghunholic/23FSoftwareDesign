@@ -55,17 +55,14 @@ public class Utils {
      */
     public static String stringToHtml(String str){
         Node parseResult = flexmarkParser.parse(str);
-
-        // append 'markdown-body' class into html body
-        String htmlOutput = flexHtmlRenderer.render(parseResult);
-        Document doc = Jsoup.parse(htmlOutput);
-        doc.body().addClass("markdown-body");
-
-        return doc.html();
+        return flexHtmlRenderer.render(parseResult);
     }
 
     public static String stringToHtmlWithCss(String string){
-        return style + stringToHtml(string);
+        Document doc = Jsoup.parse(stringToHtml(string));
+        doc.head().html(style);
+        doc.body().addClass("markdown-body");
+        return doc.outerHtml();
     }
 
     public static Node flexmarkParse(String input){
