@@ -58,21 +58,13 @@ public class MultiLineBlock extends Block {
                 if(e.getKeyCode() == KeyEvent.VK_ENTER){
                     e.consume();
                 }
-                else if(e.getKeyCode() == KeyEvent.VK_UP && isFirstLine()){
-                    requestManager(BlockEvent.OUTFOCUS_BLOCK_UP);
-                }
-
-                else if(e.getKeyCode() == KeyEvent.VK_DOWN && isLastLine()){
-                    requestManager(BlockEvent.OUTFOCUS_BLOCK_DOWN);
-                }
-
                 previousCaretPosition = getCaretPosition();
             }
 
             @Override
             public void keyReleased(KeyEvent e) {
                 if(e.getKeyCode() == KeyEvent.VK_ENTER){
-                    requestManager(BlockEvent.UPDATE_BLOCK);
+                    requestManager(BlockEvent.UPDATE_BLOCK, getCaretPosition());
 
                     String text = getMdText();
                     int caret = getCaretPosition();
@@ -93,7 +85,7 @@ public class MultiLineBlock extends Block {
                         Pattern regex = Pattern.compile(pattern);
                         if(regex.matcher(curLine).matches()){
                             getBlock().setText(text + "\n");
-                            requestManager(BlockEvent.NEW_BLOCK);
+                            requestManager(BlockEvent.NEW_BLOCK, 0);
                         }
                         else{
                             String insertStr = getNewLine();
@@ -111,19 +103,20 @@ public class MultiLineBlock extends Block {
                     }
                     else if(CaretPosition==-1)
                     {
-                        requestManager(BlockEvent.DELETE_BLOCK);
+                        requestManager(BlockEvent.DELETE_BLOCK, -1);
                     }
                 }
 
                 else if(e.getKeyCode() == KeyEvent.VK_UP){
                     if(isCaretInFirstLine(previousCaretPosition)) {
-                        requestManager(BlockEvent.OUTFOCUS_BLOCK_UP);
+                        requestManager(BlockEvent.OUTFOCUS_BLOCK_UP, getCaretPosition());
                     }
                 }
 
                 else if(e.getKeyCode() == KeyEvent.VK_DOWN){
                     if(isCaretInLastLine(previousCaretPosition)){
-                        requestManager(BlockEvent.OUTFOCUS_BLOCK_DOWN);
+                        requestManager(BlockEvent.OUTFOCUS_BLOCK_DOWN,
+                                getCaretPosition() - Math.max(0, getMdText().lastIndexOf('\n')));
                     }
                 }
             }
@@ -164,13 +157,5 @@ public class MultiLineBlock extends Block {
         int lastLine = root.getElementCount() - 1;
 
         return line == lastLine;
-    }
-
-    private boolean isFirstLine(){
-        return getText().indexOf('\n') >= getCaretPosition();
-    }
-
-    private boolean isLastLine(){
-        return getText().lastIndexOf('\n') < getCaretPosition();
     }
 }
