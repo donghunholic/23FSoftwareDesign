@@ -132,7 +132,7 @@ public class MultiLineBlock extends Block {
     }
 
     private String getNewLine(){
-        return  "\n" + " ".repeat(Math.max(0, getIndent_level() * 2)) +
+        return  "\n" + " ".repeat(Math.max(0, getIndent())) +
                 prefix + " ";
     }
 
@@ -158,4 +158,34 @@ public class MultiLineBlock extends Block {
 
         return line == lastLine;
     }
+
+    public int getIndent() {
+        int indent = 0;
+        int caret = getCaretPosition();
+
+        String[] lines = getMdText().split("\n");
+
+        int totalChars = 0;
+        for (String line : lines) {
+            totalChars += line.length() + 1;
+            if (totalChars > caret) {
+                indent = countSpace(line);
+                break;
+            }
+        }
+
+        return indent;
+    }
+
+    private int countSpace(String line) {
+        int cnt = 0;
+        for (char c : line.toCharArray()) {
+            if (c == ' ') {
+                cnt++;
+            }
+            else break;
+        }
+        return cnt;
+    }
+
 }
