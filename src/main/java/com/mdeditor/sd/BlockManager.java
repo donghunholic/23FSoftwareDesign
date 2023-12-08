@@ -259,7 +259,7 @@ public class BlockManager {
             cur = blockList.get(cur_idx);
             up = blockList.get(cur_idx - 1);
             if(cur instanceof MultiLineBlock && up instanceof MultiLineBlock){
-                if(Objects.equals(((MultiLineBlock) cur).prefix, ((MultiLineBlock) up).prefix)){
+                if(Objects.equals(((MultiLineBlock) cur).prefix, ((MultiLineBlock) up).prefix) || (Utils.isOL(((MultiLineBlock) cur).prefix)) && Utils.isOL(((MultiLineBlock) up).prefix)){
                     up.setMdText(up.getMdText() + "\n" + cur.getMdText());
                     blockList.remove(cur);
                     cur_idx--;
@@ -271,7 +271,7 @@ public class BlockManager {
             cur = blockList.get(cur_idx);
             down = blockList.get(cur_idx + 1);
             if(cur instanceof MultiLineBlock && down instanceof MultiLineBlock){
-                if(Objects.equals(((MultiLineBlock) cur).prefix, ((MultiLineBlock) down).prefix)){
+                if(Objects.equals(((MultiLineBlock) cur).prefix, ((MultiLineBlock) down).prefix) || (Utils.isOL(((MultiLineBlock) cur).prefix)) && Utils.isOL(((MultiLineBlock) down).prefix)){
                     cur.setMdText(cur.getMdText() + "\n" + down.getMdText());
                     blockList.remove(down);
                     mergeBlock(cur_idx);
