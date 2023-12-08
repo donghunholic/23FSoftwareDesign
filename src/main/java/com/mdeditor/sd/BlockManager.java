@@ -251,7 +251,7 @@ public class BlockManager {
                 block = new SingleLineBlock(this);
             }
 
-            String markdownText = child.getChars().toString();
+            String markdownText = child.getChars().toString().trim();
             block.setMdText(markdownText);
 
             blocks.add(block);

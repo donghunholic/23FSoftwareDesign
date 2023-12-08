@@ -44,25 +44,22 @@ public class MarkdownEditorImpl implements MarkdownEditor {
     private final VirtualFile file;
     private final Project project;
 
-    private final Block EditorText;
-
-    private BlockManager blockManager;
+    // blocks
+    private final BlockManager blockManager;
 
     // for UI
-    private List<Block> blocks;
     private Box interiorPanel; // for vertical align : blocks are in here
     private JScrollPane scrollPane; // for scroll
 
     public MarkdownEditorImpl(Project project, VirtualFile file) {
         this.file = file;
         this.project = project;
-        this.blockManager = new BlockManager((MarkdownEditor)this);
-        this.EditorText = new Block(this.blockManager);
+        this.blockManager = new BlockManager(this);
+
+        // set ui
         updateEditor();
-
-        EditorText.setContentType("text/html");
-        EditorText.setEditable(true);
-
+        initUI();
+        setInitialUI();
 
         // Add a listener to detect file editor changes
         project.getMessageBus().connect()
@@ -71,10 +68,6 @@ public class MarkdownEditorImpl implements MarkdownEditor {
                 .subscribe(FileEditorManagerListener.Before.FILE_EDITOR_MANAGER, getFileEditorManagerListener_Before());
         project.getMessageBus().connect()
                 .subscribe(ProjectManager.TOPIC, getProjectManagerListener());
-
-        initBlocks();
-        initUI();
-        setInitialUI();
     }
 
     //VirtualFile Save Function
@@ -149,39 +142,6 @@ public class MarkdownEditorImpl implements MarkdownEditor {
                 updateMarkdownFile();
             }
         };
-    }
-
-
-
-    private void initBlocks() {
-        blocks = new LinkedList<>();
-
-
-//        InputStream testHtmlStream = getClass().getClassLoader().getResourceAsStream("editor/markdown.html");
-//        if(testHtmlStream != null){
-//            try {
-//                String testHtmlContent = new String(testHtmlStream.readAllBytes());
-//
-//                Block block = new Block(this.blockManager);
-//                block.setContentType("text/html");
-//                block.setText(makeHtmlWithCss(testHtmlContent));
-//                block.setEditable(true);
-//                block.setBackground(Color.WHITE);
-//                blocks.add(block);
-//            }catch (IOException e) {
-//                throw new RuntimeException(e);
-//            }
-//        }
-
-        //TODO: File loading,
-        //Codes above are example of load file
-        //codes below are example of current editor
-
-//        Block block = new Block(this.blockManager);
-//        block.setContentType("text/html");
-//        block.setText(makeHtmlWithCss(Utils.stringToHtml(EditorText.getText())));
-//        block.setEditable(true);
-//        block.setBackground(Color.WHITE);
     }
 
     private void initUI(){
