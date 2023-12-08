@@ -125,6 +125,7 @@ public class MultiLineBlock extends Block {
                     System.out.println(Arrays.toString(lines));
                     int caret = getCaretPosition();
                     int lineNum = getWhichLine(lines, caret);
+                    if(lineNum == 0) return;
                     StringBuilder newText = new StringBuilder();
                     for(int i = 0; i < lines.length; i++){
                         if(i == lineNum){
