@@ -55,7 +55,7 @@ public class MultiLineBlock extends Block {
                     CaretPosition=getCaretPosition();
                 }
 
-                if(e.getKeyCode() == KeyEvent.VK_ENTER){
+                if(e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_TAB){
                     e.consume();
                 }
                 previousCaretPosition = getCaretPosition();
@@ -119,6 +119,23 @@ public class MultiLineBlock extends Block {
                                 getCaretPosition() - Math.max(0, getMdText().lastIndexOf('\n')));
                     }
                 }
+
+                else if (e.getKeyCode() == KeyEvent.VK_TAB){
+                    String[] lines = getText().split("\n");
+                    System.out.println(Arrays.toString(lines));
+                    int caret = getCaretPosition();
+                    int lineNum = getWhichLine(lines, caret);
+                    StringBuilder newText = new StringBuilder();
+                    for(int i = 0; i < lines.length; i++){
+                        if(i == lineNum){
+                            newText.append("  ");
+                        }
+                        newText.append(lines[i]).append("\n");
+                    }
+                    getBlock().setMdText(newText.toString());
+                    getBlock().setText(getMdText());
+                    setCaretPosition(caret + 2);
+                }
             }
         });
     }
@@ -160,21 +177,21 @@ public class MultiLineBlock extends Block {
     }
 
     public int getIndent() {
-        int indent = 0;
         int caret = getCaretPosition();
-
         String[] lines = getMdText().split("\n");
 
+        return countSpace(lines[getWhichLine(lines, caret)]);
+    }
+
+    public int getWhichLine(String[] lines, int caret) {
         int totalChars = 0;
-        for (String line : lines) {
-            totalChars += line.length() + 1;
+        for (int i = 0; i < lines.length; i++) {
+            totalChars += lines[i].length() + 1;
             if (totalChars > caret) {
-                indent = countSpace(line);
-                break;
+                return i;
             }
         }
-
-        return indent;
+        return lines.length;
     }
 
     private int countSpace(String line) {
