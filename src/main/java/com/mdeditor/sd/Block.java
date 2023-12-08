@@ -35,7 +35,6 @@ public class Block extends JTextPane {
             @Override
             public void mouseClicked(MouseEvent e) {
                 requestManager(BlockEvent.OUTFOCUS_CLICKED, getCaretPosition());
-
             }
 
             @Override
@@ -138,5 +137,93 @@ public class Block extends JTextPane {
 
     public int getIndent_level(){
         return this.indent_level;
+    }
+
+    public int getCaretPosition(int position){
+        if (mdText == null || mdText.isEmpty() || position < 0 || position > mdText.length()) {
+            return -1;
+        }
+
+
+        int prefixPos=0;
+        while(mdText.charAt(prefixPos)==' ')
+        {
+            prefixPos++;
+        }
+        char prefix = mdText.charAt(prefixPos);
+        switch (prefix) {
+            case '#':
+                return MarkdownHeaderPosition(position);
+            case '-':
+                return MarkdownUnorderedListPosition(position);
+            default:
+                return -1;
+        }
+    }
+
+
+    private int MarkdownHeaderPosition(int position) {
+        int prefixLength = getHeaderPrefixLength();
+        if (prefixLength == -1 || position < prefixLength) {
+            return -1;
+        }
+
+        int adjustedPosition = position + prefixLength - 1;
+        return adjustedPosition;
+    }
+
+    private int getHeaderPrefixLength() {
+        int length = 0;
+        for (int i = 0; i < mdText.length(); i++) {
+            if (mdText.charAt(i) == '#') {
+                length++;
+            } else if (mdText.charAt(i) == ' ') {
+                return length + 1;
+            } else {
+                return -1;
+            }
+        }
+        return -1;
+    }
+
+    private int MarkdownUnorderedListPosition(int position) {
+        int htmlPos=0;
+        char targetChar='-';
+        int startpos=mdText.indexOf(targetChar);
+        while(htmlPos<=position)
+        {
+            startpos++;
+            if(mdText.charAt(startpos)==' ')
+            {
+                continue;
+            }
+            int endpos=mdText.indexOf('\n', startpos);
+            if(endpos==-1)
+            {
+                endpos=mdText.length();
+            }
+
+            htmlPos++;
+            if(htmlPos==position)
+            {
+                return startpos;
+            }
+            int curPos=startpos;
+            for(int i=0;i<endpos-startpos;i++)
+            {
+                htmlPos++;
+                curPos++;
+                if(htmlPos==position)
+                {
+                    return curPos;
+                }
+            }
+            startpos=mdText.indexOf(targetChar, startpos + 1);
+            if(startpos==-1)
+            {
+                break;
+            }
+        }
+        return -1;
     }
 }
