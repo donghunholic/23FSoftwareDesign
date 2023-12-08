@@ -124,6 +124,7 @@ public class BlockManager {
         String prefix = "";
         String newSingleStr = "";
         String newMultiStr = "";
+        String sliced = "";
         int prefix_len = 0;
         boolean is_last_line = false;
         if(Utils.prefix_check(temp) != 0){
@@ -138,7 +139,8 @@ public class BlockManager {
                 if(is_last_line){
                     break;
                 }
-                if(!str.substring(nl_idx, nl_idx + prefix_len).equals(prefix)){
+                sliced = str.substring(nl_idx, nl_idx + prefix_len);
+                if(!sliced.equals(prefix) && (Utils.isOL(prefix) && !Utils.isOL(sliced))){
                     newSingleStr = str.substring(nl_idx);
                     newMultiStr = str.substring(0,nl_idx);
                     MultiLineBlock curBlock = new MultiLineBlock(this, prefix);
@@ -196,7 +198,7 @@ public class BlockManager {
 
     /**
      * @param markdownString : markdown string to parse into blocks.
-     * @return list of Blockk, which contains only mdText.
+     * @return list of Block, which contains only mdText.
      */
     public List<Block> parseStringIntoBlocks(String markdownString){
         List<Block> blocks = new LinkedList<>();

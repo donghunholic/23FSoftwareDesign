@@ -91,7 +91,7 @@ public class Utils {
         else if (prefix.endsWith(".")){
             try {
                  Integer.parseInt(prefix.substring(0, prefix.length() - 1));
-                 return prefix.length() - 1;
+                 return prefix.length();
             } catch (NumberFormatException e) {
                 return 0;
             }
@@ -103,6 +103,18 @@ public class Utils {
         String temp = block.getMdText();
         if (temp.startsWith("|") && temp.endsWith("|")) {}
         return true;
+    }
+
+    public static boolean isOL(String pre){
+        //int blankIdx = line.indexOf(" ");
+        //if(blankIdx != -1){
+        //    String pre = line.substring(0, blankIdx);
+            if(pre.endsWith(".")){
+                return pre.substring(0, pre.indexOf(".")).matches("\\d+");
+            }
+        //}
+
+        return false;
     }
 }
 
