@@ -26,12 +26,14 @@ public class BlockManager {
      * Handle Focus event
      * Block is created or deleted, request update to MarkdownEditor
      */
-    public void update(Block block, BlockEvent e) {
+    public void update(Block block, BlockEvent e, int pos) {
         int idx = blockList.indexOf(block);
         blockOnFocus.setMdText(blockOnFocus.getText().strip());
 
+        int caretPos = pos;
+
         switch (e) {
-            case UPDATE_BLOCK -> { }
+            case UPDATE_BLOCK -> { return; }
 
             case NEW_BLOCK -> {
                 String str = block.getMdText().substring(block.getCaretPosition()-1);
@@ -45,6 +47,7 @@ public class BlockManager {
             case DELETE_BLOCK -> {
                 if(idx > 0){
                     Block newFocusBlock = blockList.get(idx-1);
+                    caretPos = newFocusBlock.getMdText().length();
                     newFocusBlock.setMdText(newFocusBlock.getMdText() + block.getMdText());
                     blockList.remove(block);
                     block.destruct();
@@ -56,7 +59,7 @@ public class BlockManager {
                     manageBlock(idx);
                     blockList.get(idx).renderHTML();
                     this.blockOnFocus = blockList.get(idx-1);
-
+                    caretPos = Math.max(0, blockOnFocus.getMdText().lastIndexOf('\n')) + pos;
                 }
             }
             case OUTFOCUS_BLOCK_DOWN -> {
@@ -67,9 +70,12 @@ public class BlockManager {
                 }
             }
             case OUTFOCUS_CLICKED ->{
-                manageBlock(idx);
-                blockOnFocus.renderHTML();
-                blockOnFocus = blockList.get(idx);
+
+                if(blockOnFocus != blockList.get(idx)){
+                    manageBlock(idx);
+                    blockOnFocus.renderHTML();
+                    blockOnFocus = blockList.get(idx);
+                }
             }
             case TRANSFORM_MULTI -> {
                 String temp = block.getMdText();
@@ -86,7 +92,7 @@ public class BlockManager {
             }
             default -> { throw new IllegalStateException("Unexpected value: " + e); }
         }
-        renderAll();
+        renderAll(caretPos);
     }
 
     public List<Block> getBlockList(){
@@ -190,11 +196,45 @@ public class BlockManager {
 
         blockOnFocus = blockList.get(0);
         blockOnFocus.renderMD();
-        blockOnFocus.grabFocus();
-        blockOnFocus.setCaretPosition(0); // FIXME : initial focus must be in first block
 
         mdEditor.updateUI();
+        SwingUtilities.invokeLater(()->{
+            blockOnFocus.requestFocusInWindow();
+            blockOnFocus.setCaretPosition(0);
+        });
+
     }
+
+    public void renderAll(int caretPos){
+        for(Block block : blockList){
+            if(block != blockOnFocus && !block.getContentType().equals("text/html")){
+                block.renderHTML();
+            }
+        }
+
+        mdEditor.updateUI();
+
+        int pos = caretPos == -1 || caretPos > blockOnFocus.getMdText().length() ?
+                blockOnFocus.getMdText().length() : Math.max(0, caretPos);
+        SwingUtilities.invokeLater(()->{
+            blockOnFocus.requestFocusInWindow();
+            blockOnFocus.setCaretPosition(pos);
+        });
+    }
+
+    /**/
+    public Pair<Integer, Integer> getTableIndexFromMarkdownString(String markdownString){
+        List<Block> blocks = parseStringIntoBlocks(markdownString);
+        for(Block block : blocks){
+            if(block instanceof MultiLineBlock && ((MultiLineBlock) block).getType() == MultiLine.TABLE){
+                Integer startIndex = markdownString.indexOf(block.getMdText());
+                Integer endIndex = startIndex + block.getMdText().length() - 1;
+                return Pair.of(startIndex, endIndex);
+            }
+        }
+        return Pair.of(-1, -1);
+    }
+
 
     /**
      * @param markdownString : markdown string to parse into blocks.
@@ -215,41 +255,13 @@ public class BlockManager {
                 block = new SingleLineBlock(this);
             }
 
-            String markdownText = child.getChars().toString();
+            String markdownText = child.getChars().toString().trim();
             block.setMdText(markdownText);
 
             blocks.add(block);
         }
 
         return blocks;
-    }
-
-    /**/
-    public Pair<Integer, Integer> getTableIndexFromMarkdownString(String markdownString){
-        List<Block> blocks = parseStringIntoBlocks(markdownString);
-        for(Block block : blocks){
-            if(block instanceof MultiLineBlock && ((MultiLineBlock) block).getType() == MultiLine.TABLE){
-                Integer startIndex = markdownString.indexOf(block.getMdText());
-                Integer endIndex = startIndex + block.getMdText().length() - 1;
-                return Pair.of(startIndex, endIndex);
-            }
-        }
-
-        return Pair.of(-1, -1);
-    }
-
-    public void renderAll(){
-        for(Block b : blockList){
-            if(!b.getContentType().equals("text/html")){
-                b.renderHTML();
-            }
-        }
-
-        mdEditor.updateUI();
-        SwingUtilities.invokeLater(()->{
-            blockOnFocus.requestFocusInWindow();
-        });
-
     }
 
     public void mergeBlock(int idx){

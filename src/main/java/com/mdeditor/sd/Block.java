@@ -3,8 +3,6 @@ package com.mdeditor.sd;
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -36,7 +34,7 @@ public class Block extends JTextPane {
         this.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                requestManager(BlockEvent.OUTFOCUS_CLICKED);
+                requestManager(BlockEvent.OUTFOCUS_CLICKED, getCaretPosition());
 
             }
 
@@ -89,17 +87,15 @@ public class Block extends JTextPane {
      * using Utils.stringToHtml()
      */
     public void renderHTML(){
-        if(!this.getContentType().equals("text/html")){
-            this.setContentType("text/html");
-            this.setText(Utils.stringToHtmlWithCss(getMdText()));
-        }
+        this.setContentType("text/html");
+        this.setText(Utils.stringToHtmlWithCss(getMdText()));
     }
 
     /**
      * Set block's jTextPane to mdText
      */
     public void renderMD(){
-        if(!this.getContentType().equals("text/plain")){
+        if(!this.getContentType().equals("text/plain") || this.getText().isEmpty()){
             this.setContentType("text/plain");
             this.setText(mdText);
         }
@@ -117,8 +113,8 @@ public class Block extends JTextPane {
      * Requests blockManager to handle BlockEvents by keyListener
      * @param e - See BlockEvent.java
      */
-    public void requestManager(BlockEvent e){
-        blockManager.update(this, e);
+    public void requestManager(BlockEvent e, int pos){
+        blockManager.update(this, e, pos);
     }
 
     @Override
