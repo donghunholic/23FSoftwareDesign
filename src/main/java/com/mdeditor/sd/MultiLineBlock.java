@@ -150,8 +150,10 @@ public class MultiLineBlock extends Block {
     }
 
     private String getNewLine(){
+        String[] lines = getMdText().split("\n");
+        int lineIdx = getWhichLine(lines, getCaretPosition());
         return  "\n" + " ".repeat(Math.max(0, getIndent())) +
-                prefix + " ";
+                lines[lineIdx].substring(getIndent(),lines[lineIdx].indexOf(" ")) + " ";
     }
 
     public void setType(MultiLine type) {
@@ -192,7 +194,7 @@ public class MultiLineBlock extends Block {
                 return i;
             }
         }
-        return lines.length;
+        return lines.length - 1;
     }
 
     private int countSpace(String line) {

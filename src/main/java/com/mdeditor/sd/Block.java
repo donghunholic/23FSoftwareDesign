@@ -157,7 +157,7 @@ public class Block extends JTextPane {
             case '-':
                 return MarkdownUnorderedListPosition(position);
             default:
-                return -1;
+                return position;
         }
     }
 
