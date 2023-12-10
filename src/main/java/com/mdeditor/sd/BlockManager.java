@@ -59,17 +59,17 @@ public class BlockManager {
                     this.blockOnFocus = blockList.get(idx-1);
                     manageBlock(idx);
                     blockList.get(idx).renderHTML();
-                    //this.blockOnFocus = blockList.get(idx-1);
                     caretPos = Math.max(0, blockOnFocus.getMdText().lastIndexOf('\n')) + pos;
                 }
+                else return;
             }
             case OUTFOCUS_BLOCK_DOWN -> {
                 if(idx < blockList.size()-1){
                     this.blockOnFocus = blockList.get(idx+1);
                     manageBlock(idx);
                     blockList.get(idx).renderHTML();
-                    //this.blockOnFocus = blockList.get(idx+1);
                 }
+                else return;
             }
             case OUTFOCUS_CLICKED ->{
 
