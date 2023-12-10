@@ -64,6 +64,12 @@ public class MultiLineBlock extends Block {
             @Override
             public void keyReleased(KeyEvent e) {
                 if(e.getKeyCode() == KeyEvent.VK_ENTER){
+                    if(!Utils.isBlockStringMultiline(getThis())){
+                        requestManager(BlockEvent.NEW_BLOCK, getCaretPosition());
+                        requestManager(BlockEvent.TRANSFORM_SINGLE, getCaretPosition());
+                        return;
+                    }
+
                     requestManager(BlockEvent.UPDATE_BLOCK, getCaretPosition());
 
                     String text = getMdText();

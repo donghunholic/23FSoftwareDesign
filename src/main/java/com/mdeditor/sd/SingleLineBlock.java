@@ -36,7 +36,13 @@ public class SingleLineBlock extends Block {
             @Override
             public void keyReleased(KeyEvent e) {
                 if(e.getKeyCode() == KeyEvent.VK_ENTER){
-                    requestManager(BlockEvent.NEW_BLOCK, 0);
+                    if(Utils.isBlockStringMultiline(getThis())){
+                        requestManager(BlockEvent.TRANSFORM_MULTI, getCaretPosition());
+                        return;
+                    }
+                    else{
+                        requestManager(BlockEvent.NEW_BLOCK, 0);
+                    }
                 }
 
                 else if(e.getKeyCode() == KeyEvent.VK_BACK_SPACE){

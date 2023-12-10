@@ -251,4 +251,8 @@ public class Block extends JTextPane {
         }
         return -1;
     }
+
+    public Block getThis(){
+        return this;
+    }
 }

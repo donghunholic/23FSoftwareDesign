@@ -113,6 +113,24 @@ public class Utils {
 
         return false;
     }
+
+    public static boolean isBlockStringMultiline(Block block){
+        String temp = block.getText();
+        int start = block.getIndent_level() * 2;
+        int end = temp.indexOf(" ", start);
+        if (end == -1) return false;
+        String prefix = temp.substring(start, end);
+        if(prefix.equals(">") || prefix.equals("-") || prefix.equals("+")|| prefix.equals("*")) return true;
+        else if (prefix.endsWith(".")){
+            try {
+                Integer.parseInt(prefix.substring(0, prefix.length() - 1));
+                return prefix.length() > 0;
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
+        else return false;
+    }
 }
 
 
