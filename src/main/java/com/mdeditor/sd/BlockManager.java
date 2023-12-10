@@ -56,22 +56,25 @@ public class BlockManager {
             }
             case OUTFOCUS_BLOCK_UP -> {
                 if(idx > 0){
+                    this.blockOnFocus = blockList.get(idx-1);
                     manageBlock(idx);
                     blockList.get(idx).renderHTML();
-                    this.blockOnFocus = blockList.get(idx-1);
+                    //this.blockOnFocus = blockList.get(idx-1);
                     caretPos = Math.max(0, blockOnFocus.getMdText().lastIndexOf('\n')) + pos;
                 }
             }
             case OUTFOCUS_BLOCK_DOWN -> {
                 if(idx < blockList.size()-1){
+                    this.blockOnFocus = blockList.get(idx+1);
                     manageBlock(idx);
                     blockList.get(idx).renderHTML();
-                    this.blockOnFocus = blockList.get(idx+1);
+                    //this.blockOnFocus = blockList.get(idx+1);
                 }
             }
             case OUTFOCUS_CLICKED ->{
 
                 if(blockOnFocus != blockList.get(idx)){
+                    //blockOnFocus = blockList.get(idx);
                     manageBlock(idx);
                     blockOnFocus.renderHTML();
                     blockOnFocus = blockList.get(idx);
@@ -146,7 +149,7 @@ public class BlockManager {
                     break;
                 }
                 sliced = str.substring(nl_idx, nl_idx + prefix_len);
-                if(!sliced.equals(prefix) && (Utils.isOL(prefix) && !Utils.isOL(sliced))){
+                if((!sliced.equals(prefix) && !Utils.isOL(prefix)) || (Utils.isOL(prefix) && !Utils.isOL(sliced))){
                     newSingleStr = str.substring(nl_idx);
                     newMultiStr = str.substring(0,nl_idx);
                     MultiLineBlock curBlock = new MultiLineBlock(this, prefix);
@@ -208,6 +211,10 @@ public class BlockManager {
     public void renderAll(int caretPos){
         for(Block block : blockList){
             if(block != blockOnFocus && !block.getContentType().equals("text/html")){
+                block.renderHTML();
+            }
+            else{
+                block.renderMD();
                 block.renderHTML();
             }
         }
@@ -279,7 +286,7 @@ public class BlockManager {
                 }
             }
         }
-        if(idx < blockList.size()){
+        if(idx < blockList.size() - 1){
             cur = blockList.get(cur_idx);
             down = blockList.get(cur_idx + 1);
             if(cur instanceof MultiLineBlock && down instanceof MultiLineBlock){
