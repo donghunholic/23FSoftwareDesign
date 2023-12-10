@@ -36,8 +36,8 @@ public class BlockManager {
             case UPDATE_BLOCK -> { return; }
 
             case NEW_BLOCK -> {
-                String str = block.getMdText().substring(block.getCaretPosition()-1);
-                block.setMdText(block.getMdText().substring(0,block.getCaretPosition()-1));
+                String str = block.getMdText().substring(block.getCaretPosition());
+                block.setMdText(block.getMdText().substring(0,block.getCaretPosition()));
                 block.renderHTML();
                 SingleLineBlock newBlock = new SingleLineBlock(this);
                 newBlock.setMdText(str);
@@ -82,17 +82,23 @@ public class BlockManager {
                 }
             }
             case TRANSFORM_MULTI -> {
-                String temp = block.getMdText();
+                Block newBlock = new MultiLineBlock(this, "");
+                newBlock.setMdText(block.getMdText() + "\n"); // TODO: append prefix in cursor
 
-                /* Caution! : prefix parameter must be implemented */
-                blockList.add(idx, new MultiLineBlock(this, new String()));
+                blockList.add(idx, newBlock);
                 blockList.remove(block);
                 block.destruct();
-                blockList.get(idx).setMdText(temp);
-                blockList.get(idx).requestFocusInWindow();
+
+                blockOnFocus = newBlock;
+                blockOnFocus.renderMD();
             }
             case TRANSFORM_SINGLE -> {
-                //implement multi block to single block
+                Block newBlock = new SingleLineBlock(this);
+                newBlock.setMdText(block.getMdText());
+
+                blockList.add(idx, newBlock);
+                blockList.remove(block);
+                block.destruct();
             }
             default -> { throw new IllegalStateException("Unexpected value: " + e); }
         }
