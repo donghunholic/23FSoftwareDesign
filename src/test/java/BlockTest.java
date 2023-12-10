@@ -112,6 +112,7 @@ public class BlockTest {
             SwingUtilities.invokeAndWait(() -> block.dispatchEvent(new MouseEvent(block, MouseEvent.MOUSE_EXITED, System.currentTimeMillis(), 0, 0, 0, 0, true, MouseEvent.BUTTON1)));
         });
         verify(manager, atMost(1)).update(block, BlockEvent.OUTFOCUS_CLICKED, block.getCaretPosition());
+    }
 
     @Test
     void testgetCaretPosition() {
