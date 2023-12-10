@@ -8,11 +8,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 public class BlockTest {
-    @Mock
-    BlockManager manager;
     Block block;
+    BlockManager manager = mock(BlockManager.class);
 
     @BeforeEach
     void clearBlock() {
@@ -59,6 +59,26 @@ public class BlockTest {
     @Test
     void testGetManager() {
         assertEquals(block.getManager(), manager);
+    }
+
+    @Test
+    void testRequestManager() {
+        block.requestManager(BlockEvent.NEW_BLOCK, 0);
+        verify(manager).update(block, BlockEvent.NEW_BLOCK, 0);
+        block.requestManager(BlockEvent.UPDATE_BLOCK, 0);
+        verify(manager).update(block, BlockEvent.UPDATE_BLOCK, 0);
+        block.requestManager(BlockEvent.DELETE_BLOCK, 0);
+        verify(manager).update(block, BlockEvent.DELETE_BLOCK, 0);
+        block.requestManager(BlockEvent.OUTFOCUS_CLICKED, 0);
+        verify(manager).update(block, BlockEvent.OUTFOCUS_CLICKED, 0);
+        block.requestManager(BlockEvent.OUTFOCUS_BLOCK_UP, 0);
+        verify(manager).update(block, BlockEvent.OUTFOCUS_BLOCK_UP, 0);
+        block.requestManager(BlockEvent.OUTFOCUS_BLOCK_DOWN, 0);
+        verify(manager).update(block, BlockEvent.OUTFOCUS_BLOCK_DOWN, 0);
+        block.requestManager(BlockEvent.TRANSFORM_SINGLE, 0);
+        verify(manager).update(block, BlockEvent.TRANSFORM_SINGLE, 0);
+        block.requestManager(BlockEvent.TRANSFORM_MULTI, 0);
+        verify(manager).update(block, BlockEvent.TRANSFORM_MULTI, 0);
     }
 
     @Test
