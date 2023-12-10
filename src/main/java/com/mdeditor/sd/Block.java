@@ -145,40 +145,66 @@ public class Block extends JTextPane {
         }
 
 
+        char prefix=GetPrefix();
+
+        switch (prefix) {
+            case '#':
+                return MarkdownHeaderPosition(position);
+            case '>':
+                return MarkdownQuotePosition(position);
+            case '-':
+            case '*':
+            case '+':
+            case '.':
+                return MarkdownListPosition(position,prefix);
+            default:
+                return position;
+        }
+    }
+
+    private char GetPrefix(){
         int prefixPos=0;
         while(mdText.charAt(prefixPos)==' ')
         {
             prefixPos++;
         }
         char prefix = mdText.charAt(prefixPos);
-        switch (prefix) {
-            case '#':
-                return MarkdownHeaderPosition(position);
-            case '-':
-                return MarkdownUnorderedListPosition(position);
-            default:
-                return position;
+        if (Character.isDigit(prefix))
+        {
+            prefix='.';
         }
+
+        return prefix;
     }
 
-
     private int MarkdownHeaderPosition(int position) {
-        int prefixLength = getHeaderPrefixLength();
-        if (prefixLength == -1 || position < prefixLength) {
+        int prefixLength = getPrefixLength('#');
+        if (prefixLength == -1) {
             return -1;
         }
+        prefixLength++;
 
-        int adjustedPosition = position + prefixLength - 1;
+        int adjustedPosition = (position - 1) + prefixLength;
         return adjustedPosition;
     }
 
-    private int getHeaderPrefixLength() {
+    private int MarkdownQuotePosition(int position) {
+        int prefixLength = getPrefixLength('>');
+        if (prefixLength == -1) {
+            return -1;
+        }
+
+        int adjustedPosition = (position - 1) + prefixLength;
+        return adjustedPosition;
+    }
+
+    private int getPrefixLength(char prefix) {
         int length = 0;
         for (int i = 0; i < mdText.length(); i++) {
-            if (mdText.charAt(i) == '#') {
+            if (mdText.charAt(i) == prefix) {
                 length++;
-            } else if (mdText.charAt(i) == ' ') {
-                return length + 1;
+            } else if (mdText.charAt(i) != prefix) {
+                return length;
             } else {
                 return -1;
             }
@@ -186,9 +212,8 @@ public class Block extends JTextPane {
         return -1;
     }
 
-    private int MarkdownUnorderedListPosition(int position) {
+    private int MarkdownListPosition(int position, char targetChar) {
         int htmlPos=0;
-        char targetChar='-';
         int startpos=mdText.indexOf(targetChar);
         while(htmlPos<=position)
         {
