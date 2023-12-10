@@ -136,4 +136,14 @@ void function(){
         Node node = Utils.flexmarkParse("input");
         assertEquals("<p>input</p>", Utils.flexmarkHtmlRender(node).trim());
     }
+
+    @Test
+    void testSingleLineTableCheck(){
+        String head = "|asd|asd|";
+        String column = "|-|--|";
+        String not_table = "|asd|asd";
+        assertEquals(Utils.string_table_check(head), 2);
+        assertEquals(Utils.string_table_check(column), -2);
+        assertEquals(Utils.string_table_check(not_table), 0);
+    }
 }

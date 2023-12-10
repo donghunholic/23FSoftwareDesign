@@ -96,10 +96,18 @@ public class Utils {
         else return 0;
     }
 
-    public boolean table_check(Block block){
-        String temp = block.getMdText();
-        if (temp.startsWith("|") && temp.endsWith("|")) {}
-        return true;
+    public static int string_table_check(String line){
+        int vertical_bar = 0;
+        int hyphen = 0;
+        if (line.startsWith("|") && line.endsWith("|")) {
+            for(int i = 0; i < line.length(); i++){
+                if (line.charAt(i) == '|') vertical_bar++;
+                else if (line.charAt(i) == '-') hyphen++;
+            }
+            if (line.length() == vertical_bar + hyphen) return -vertical_bar + 1;
+            return vertical_bar - 1;
+        }
+        return 0;
     }
 
     public static boolean isOL(String pre){
