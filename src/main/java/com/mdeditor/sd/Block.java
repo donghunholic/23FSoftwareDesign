@@ -164,7 +164,7 @@ public class Block extends JTextPane {
     private int MarkdownHeaderPosition(int position) {
         int prefixLength = getPrefixLength('#');
         if (prefixLength == -1) {
-            return -1;
+            return position;
         }
         prefixLength++;
 
@@ -175,7 +175,7 @@ public class Block extends JTextPane {
     private int MarkdownQuotePosition(int position) {
         int prefixLength = getPrefixLength('>');
         if (prefixLength == -1) {
-            return -1;
+            return position;
         }
 
         int adjustedPosition = (position - 1) + prefixLength;
@@ -233,13 +233,11 @@ public class Block extends JTextPane {
                 break;
             }
         }
-        return -1;
+        return position;
     }
 
     public int getIndent() {
-        int caret = getCaretPosition();
         String[] lines = getMdText().split("\n");
-
         return countSpace(lines[getWhichLine(lines)]);
     }
 

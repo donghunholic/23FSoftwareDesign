@@ -78,6 +78,7 @@ public class BlockManager {
                     blockOnFocus.renderHTML();
                     blockOnFocus = blockList.get(idx);
                     blockOnFocus.setContentType("text/html");
+                    caretPos = blockOnFocus.getCaretPosition(pos);
                 }
             }
             case TRANSFORM_MULTI -> {
@@ -231,15 +232,11 @@ public class BlockManager {
 
         int pos = (caretPos == -1 || caretPos > blockOnFocus.getMdText().length()) ?
                 blockOnFocus.getMdText().length() : Math.max(0, caretPos);
-        System.out.println("caretPos");
-        System.out.println(caretPos);
-        System.out.println("pos");
-        System.out.println(pos);
         SwingUtilities.invokeLater(()->{
             blockOnFocus.requestFocusInWindow();
             if(ContentType.equals("text/html"))
             {
-                blockOnFocus.setCaretPosition(blockOnFocus.getCaretPosition(pos));
+                blockOnFocus.setCaretPosition(pos);
             }
             else
             {
