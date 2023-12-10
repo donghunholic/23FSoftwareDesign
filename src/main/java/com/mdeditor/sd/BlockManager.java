@@ -210,12 +210,9 @@ public class BlockManager {
     }
 
     public void renderAll(int caretPos){
+        String ContentType=blockOnFocus.getContentType();
         for(Block block : blockList){
             if(block != blockOnFocus && !block.getContentType().equals("text/html")){
-                block.renderHTML();
-            }
-            else{
-                block.renderMD();
                 block.renderHTML();
             }
         }
@@ -224,8 +221,11 @@ public class BlockManager {
 
         int pos = caretPos == -1 || caretPos > blockOnFocus.getMdText().length() ?
                 blockOnFocus.getMdText().length() : Math.max(0, caretPos);
+        System.out.println("caretPos");
+        System.out.println(caretPos);
+        System.out.println("pos");
+        System.out.println(pos);
         SwingUtilities.invokeLater(()->{
-            String ContentType=blockOnFocus.getContentType();
             blockOnFocus.requestFocusInWindow();
             if(ContentType.equals("text/html"))
             {
