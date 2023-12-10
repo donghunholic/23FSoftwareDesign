@@ -151,7 +151,7 @@ public class BlockManager {
                     break;
                 }
                 sliced = str.substring(nl_idx, nl_idx + prefix_len);
-                if((!sliced.equals(prefix) && !Utils.isOL(prefix)) || (Utils.isOL(prefix) && !Utils.isOL(sliced))){
+                if((!sliced.equals(prefix) && !isPrefixOl) || (isPrefixOl && !Utils.isOL(sliced))){
                     newSingleStr = str.substring(nl_idx);
                     if(newSingleStr.endsWith("\n")){
                         newSingleStr = newSingleStr.substring(0, newSingleStr.length() - 1);
