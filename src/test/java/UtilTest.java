@@ -1,20 +1,33 @@
+import com.mdeditor.sd.Block;
+import com.mdeditor.sd.BlockManager;
 import com.mdeditor.sd.Utils;
 import com.vladsch.flexmark.util.sequence.BasedSequence;
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import com.vladsch.flexmark.util.ast.Node;
+import org.mockito.Mock;
 
 import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Scanner;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class UtilTest {
+    @Mock
+    BlockManager manager;
+    Block block;
+
+    @BeforeEach
+    void clearBlock() {
+        block = new Block(manager);
+    }
+
     @Test
     void testWrapWithHtmlTag() {
         String tag = "p";
@@ -135,5 +148,52 @@ void function(){
     void testFlexmarkHtmlRender(){
         Node node = Utils.flexmarkParse("input");
         assertEquals("<p>input</p>", Utils.flexmarkHtmlRender(node).trim());
+    }
+
+    @ParameterizedTest(name = "testPrefixCheck_{index}")
+    @CsvSource({
+            "# Head1, 0, 0",
+            "> quote, 1, 1",
+            "textBlock, 0, 0",
+            "1. OL, 0, 2",
+            "2. OL, 1, 2",
+            "- uol, 0, 1",
+            "123. OL, 1, 4"
+    })
+    void testPrefixCheck(String mdText, int indent, int result) {
+        block.setMdText("  ".repeat(indent) + mdText);
+        block.setIndent_level(indent);
+        assertEquals(result, Utils.prefix_check(block));
+    }
+
+    @Test
+    void testPrefixCheckException() {
+        block.setMdText("  " + "a. alphabet");
+        block.setIndent_level(1);
+        assertEquals(0, Utils.prefix_check(block));
+    }
+
+    @Test
+    void testTableCheck() {
+        String content = """
+| column 1 | column 2 |
+| -------- | -------- |
+| data 1   | data 2   |
+""";
+        block.setMdText(content);
+        assertTrue(Utils.table_check(block));
+    }
+
+    @ParameterizedTest(name = "testIsOL_{index}")
+    @CsvSource({
+            ">, false",
+            "-, false",
+            "###, false",
+            "12., true",
+            "1., true",
+            "321., true"
+    })
+    void testIsOL(String prefix, boolean result) {
+        assertEquals(result, Utils.isOL(prefix));
     }
 }
