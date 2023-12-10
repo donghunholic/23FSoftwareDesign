@@ -152,7 +152,13 @@ public class BlockManager {
                 sliced = str.substring(nl_idx, nl_idx + prefix_len);
                 if((!sliced.equals(prefix) && !Utils.isOL(prefix)) || (Utils.isOL(prefix) && !Utils.isOL(sliced))){
                     newSingleStr = str.substring(nl_idx);
+                    if(newSingleStr.endsWith("\n")){
+                        newSingleStr = newSingleStr.substring(0, newSingleStr.length() - 1);
+                    }
                     newMultiStr = str.substring(0,nl_idx);
+                    if(newMultiStr.endsWith("\n")){
+                        newMultiStr = newMultiStr.substring(0, newMultiStr.length() - 1);
+                    }
                     MultiLineBlock curBlock = new MultiLineBlock(this, prefix);
                     SingleLineBlock newBlock = new SingleLineBlock(this);
                     newBlock.setMdText(newSingleStr);
@@ -175,6 +181,9 @@ public class BlockManager {
             if(!is_last_line){
                 nl_idx = str.indexOf("\n", nl_idx);
                 newSingleStr = str.substring(0, nl_idx + 1);
+                if(newSingleStr.endsWith("\n")){
+                    newSingleStr = newSingleStr.substring(0, newSingleStr.length() - 1);
+                }
                 SingleLineBlock newBlock = new SingleLineBlock(this);
                 newBlock.setMdText(newSingleStr);
                 blockList.add(cur,newBlock);
@@ -219,7 +228,7 @@ public class BlockManager {
 
         mdEditor.updateUI();
 
-        int pos = caretPos == -1 || caretPos > blockOnFocus.getMdText().length() ?
+        int pos = (caretPos == -1 || caretPos > blockOnFocus.getMdText().length()) ?
                 blockOnFocus.getMdText().length() : Math.max(0, caretPos);
         System.out.println("caretPos");
         System.out.println(caretPos);
@@ -289,6 +298,12 @@ public class BlockManager {
             if(cur instanceof MultiLineBlock && up instanceof MultiLineBlock){
                 if(Objects.equals(((MultiLineBlock) cur).prefix, ((MultiLineBlock) up).prefix) || (Utils.isOL(((MultiLineBlock) cur).prefix)) && Utils.isOL(((MultiLineBlock) up).prefix)){
                     up.setMdText(up.getMdText() + "\n" + cur.getMdText());
+                    if(blockOnFocus == cur){
+                        blockOnFocus = blockList.get(cur_idx + 1);
+                        SwingUtilities.invokeLater(()->{
+                            blockOnFocus.requestFocusInWindow();
+                        });
+                    }
                     blockList.remove(cur);
                     cur_idx--;
                     mergeBlock(cur_idx);
@@ -301,11 +316,19 @@ public class BlockManager {
             if(cur instanceof MultiLineBlock && down instanceof MultiLineBlock){
                 if(Objects.equals(((MultiLineBlock) cur).prefix, ((MultiLineBlock) down).prefix) || (Utils.isOL(((MultiLineBlock) cur).prefix)) && Utils.isOL(((MultiLineBlock) down).prefix)){
                     cur.setMdText(cur.getMdText() + "\n" + down.getMdText());
+                    if(blockOnFocus == down){
+                        blockOnFocus = cur;
+                        SwingUtilities.invokeLater(()->{
+                            blockOnFocus.requestFocusInWindow();
+                        });
+                    }
                     blockList.remove(down);
                     mergeBlock(cur_idx);
                 }
             }
         }
+        blockList.get(cur_idx).renderMD();
+        blockList.get(cur_idx).renderHTML();
     }
 
     public void manageBlock(int idx){
