@@ -80,15 +80,17 @@ public class MultiLineBlock extends Block {
                         text = text.stripTrailing();
                     }
 
-                    if(caret < text.length()){
+                    if(!isCaretInLastLine(caret)){
                         String insertStr = getNewLine();
                         getBlock().setText(text.substring(0,caret) + insertStr + text.substring(caret));
                         setCaretPosition(caret + insertStr.length());
                     }
                     else{
-                        String curLine = getLastLine(text);
-                        String pattern = "^[ ]*" + Pattern.quote(prefix) + "?[\n]*$";
-                        Pattern regex = Pattern.compile(pattern);
+                        String[] lines = getMdText().split("\n");
+                        String curLine = lines[getWhichLine(lines)];
+                        String pref = curLine.substring(getIndent(), getIndent() + Utils.prefix_check(getBlock()));
+
+                        Pattern regex = Pattern.compile("^[ ]*" + Pattern.quote(pref) + "?[\n]*$");
                         if(regex.matcher(curLine).matches()){
                             getBlock().setText(text + "\n");
                             requestManager(BlockEvent.NEW_BLOCK, 0);
@@ -128,9 +130,8 @@ public class MultiLineBlock extends Block {
 
                 else if (e.getKeyCode() == KeyEvent.VK_TAB){
                     String[] lines = getText().split("\n");
-                    System.out.println(Arrays.toString(lines));
                     int caret = getCaretPosition();
-                    int lineNum = getWhichLine(lines, caret);
+                    int lineNum = getWhichLine(lines);
                     if(lineNum == 0) return;
                     StringBuilder newText = new StringBuilder();
                     for(int i = 0; i < lines.length; i++){
@@ -147,19 +148,20 @@ public class MultiLineBlock extends Block {
         });
     }
 
-    private static String getLastLine(String input) {
-        String[] lines = input.split("\n");
-
-        return Arrays.stream(lines)
-                .reduce((first, second) -> second)
-                .orElse("");
-    }
-
     private String getNewLine(){
         String[] lines = getMdText().split("\n");
-        int lineIdx = getWhichLine(lines, getCaretPosition());
-        return  "\n" + " ".repeat(Math.max(0, getIndent())) +
-                lines[lineIdx].substring(getIndent(),lines[lineIdx].indexOf(" ")) + " ";
+        int indent = getIndent();
+        int cur = getWhichLine(lines);
+        String pref = lines[cur]
+                .substring(indent, indent + Utils.getPrefixAtLine(this, cur));
+        if(pref.endsWith(".")){
+            pref = String.valueOf(Integer.parseInt(pref.substring(0, pref.length() - 1)) + 1) + ".";
+        }
+        String ret = "\n" + " ".repeat(indent) + pref;
+        if(!pref.isEmpty()){
+            ret += " ";
+        }
+        return ret;
     }
 
     public void setType(MultiLine type) {
@@ -184,34 +186,4 @@ public class MultiLineBlock extends Block {
 
         return line == lastLine;
     }
-
-    public int getIndent() {
-        int caret = getCaretPosition();
-        String[] lines = getMdText().split("\n");
-
-        return countSpace(lines[getWhichLine(lines, caret)]);
-    }
-
-    public int getWhichLine(String[] lines, int caret) {
-        int totalChars = 0;
-        for (int i = 0; i < lines.length; i++) {
-            totalChars += lines[i].length() + 1;
-            if (totalChars > caret) {
-                return i;
-            }
-        }
-        return lines.length - 1;
-    }
-
-    private int countSpace(String line) {
-        int cnt = 0;
-        for (char c : line.toCharArray()) {
-            if (c == ' ') {
-                cnt++;
-            }
-            else break;
-        }
-        return cnt;
-    }
-
 }

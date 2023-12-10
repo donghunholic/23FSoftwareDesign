@@ -15,21 +15,13 @@ public class Block extends JTextPane {
 
     private String mdText;
     private BlockManager blockManager;
-
-    public final String indent = "  ";
-    private int indent_level;
-
-    //protected int PreCaretPosition;
     protected int CaretPosition;
 
     public Block(BlockManager manager){
         this.mdText = "";
         this.setEditable(true);
         this.blockManager = manager;
-        this.indent_level = 0;
-        //PreCaretPosition=0;
-        CaretPosition=0;
-
+        this.CaretPosition=0;
 
         this.addMouseListener(new MouseListener() {
             @Override
@@ -131,14 +123,6 @@ public class Block extends JTextPane {
         blockManager = null;
     }
 
-    public void setIndent_level(int level){
-        indent_level = level;
-    }
-
-    public int getIndent_level(){
-        return this.indent_level;
-    }
-
     public int getCaretPosition(int position){
         if (mdText == null || mdText.isEmpty() || position < 0 || position > mdText.length()) {
             return -1;
@@ -180,7 +164,7 @@ public class Block extends JTextPane {
     private int MarkdownHeaderPosition(int position) {
         int prefixLength = getPrefixLength('#');
         if (prefixLength == -1) {
-            return -1;
+            return position;
         }
         prefixLength++;
 
@@ -191,7 +175,7 @@ public class Block extends JTextPane {
     private int MarkdownQuotePosition(int position) {
         int prefixLength = getPrefixLength('>');
         if (prefixLength == -1) {
-            return -1;
+            return position;
         }
 
         int adjustedPosition = (position - 1) + prefixLength;
@@ -249,7 +233,46 @@ public class Block extends JTextPane {
                 break;
             }
         }
-        return -1;
+        return position;
+    }
+
+    public int getIndent() {
+        String[] lines = getMdText().split("\n");
+        return countSpace(lines[getWhichLine(lines)]);
+    }
+
+    /**
+     * Returns the number of space at lineNum
+     * @param lineNum - Line which you want to check indent
+     * @return number of space
+     */
+    public int getIndentAtLine(int lineNum){
+        String[] lines = getMdText().split("\n");
+
+        return countSpace(lines[lineNum]);
+    }
+
+    public int getWhichLine(String[] lines) {
+        int caret = getCaretPosition();
+        int totalChars = 0;
+        for (int i = 0; i < lines.length; i++) {
+            totalChars += lines[i].length() + 1;
+            if (totalChars > caret) {
+                return i;
+            }
+        }
+        return lines.length - 1;
+    }
+
+    private int countSpace(String line) {
+        int cnt = 0;
+        for (char c : line.toCharArray()) {
+            if (c == ' ') {
+                cnt++;
+            }
+            else break;
+        }
+        return cnt;
     }
 
     public Block getThis(){

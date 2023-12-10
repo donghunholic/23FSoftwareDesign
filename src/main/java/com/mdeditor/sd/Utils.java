@@ -74,13 +74,13 @@ public class Utils {
     }
 
     /**
-     * returns the scope of indext that prefix takes.
+     * returns the scope of index that prefix takes.
      * @param block - the block that wants to check if it has prefix.
      * @return - the index that prefix ends. if there is no prefix, returns 0;
      */
     public static int prefix_check(Block block){
         String temp = block.getMdText();
-        int start = block.getIndent_level() * 2;
+        int start = block.getIndent();
         int end = temp.indexOf(" ", start);
         if (end == -1) return 0;
         String prefix = temp.substring(start, end);
@@ -94,6 +94,42 @@ public class Utils {
             }
         }
         else return 0;
+    }
+
+    public static int getPrefixAtLine(Block block, int whichLine){
+        String curLine = block.getMdText().split("\n")[whichLine];
+        int start = block.getIndentAtLine(whichLine);
+        int end = curLine.indexOf(" ", start);
+        if (end == -1) return 0;
+        String prefix = curLine.substring(start, end);
+        if(prefix.equals(">") || prefix.equals("-") || prefix.equals("+")|| prefix.equals("*")) return 1;
+        else if (prefix.endsWith(".")){
+            try {
+                Integer.parseInt(prefix.substring(0, prefix.length() - 1));
+                return prefix.length();
+            } catch (NumberFormatException e) {
+                return 0;
+            }
+        }
+        else return 0;
+    }
+
+    public static String getPrefix(Block block, int whichLine){
+        String curLine = block.getMdText().split("\n")[whichLine];
+        int start = block.getIndentAtLine(whichLine);
+        int end = curLine.indexOf(" ", start);
+        if (end == -1) return "";
+        String prefix = curLine.substring(start, end);
+        if(prefix.equals(">") || prefix.equals("-") || prefix.equals("+")|| prefix.equals("*")) return prefix;
+        else if (prefix.endsWith(".")){
+            try {
+                Integer.parseInt(prefix.substring(0, prefix.length() - 1));
+                return prefix;
+            } catch (NumberFormatException e) {
+                return "";
+            }
+        }
+        else return "";
     }
 
     public boolean table_check(Block block){

@@ -59,26 +59,26 @@ public class BlockManager {
                     this.blockOnFocus = blockList.get(idx-1);
                     manageBlock(idx);
                     blockList.get(idx).renderHTML();
-                    //this.blockOnFocus = blockList.get(idx-1);
                     caretPos = Math.max(0, blockOnFocus.getMdText().lastIndexOf('\n')) + pos;
                 }
+                else return;
             }
             case OUTFOCUS_BLOCK_DOWN -> {
                 if(idx < blockList.size()-1){
                     this.blockOnFocus = blockList.get(idx+1);
                     manageBlock(idx);
                     blockList.get(idx).renderHTML();
-                    //this.blockOnFocus = blockList.get(idx+1);
                 }
+                else return;
             }
             case OUTFOCUS_CLICKED ->{
-
                 if(blockOnFocus != blockList.get(idx)){
                     //blockOnFocus = blockList.get(idx);
                     manageBlock(idx);
                     blockOnFocus.renderHTML();
                     blockOnFocus = blockList.get(idx);
                     blockOnFocus.setContentType("text/html");
+                    caretPos = blockOnFocus.getCaretPosition(pos);
                 }
             }
             case TRANSFORM_MULTI -> {
@@ -133,9 +133,8 @@ public class BlockManager {
      * @param idx - the integer of Block's index. Must have value between 0 ~ BlockList.length()
      */
     public void BlockParse(int idx){
-        int cur = idx;
         int nl_idx = 0;
-        Block temp = this.blockList.get(cur);
+        Block temp = this.blockList.get(idx);
         String str = temp.getMdText();
         String prefix = "";
         String newSingleStr = "";
@@ -143,20 +142,23 @@ public class BlockManager {
         String sliced = "";
         int prefix_len = 0;
         boolean is_last_line = false;
-        if(Utils.prefix_check(temp) != 0){
-            prefix_len = Utils.prefix_check(temp);
-            prefix = str.substring(temp.getIndent_level() * 2, temp.getIndent_level() * 2 + prefix_len);
-            blockList.remove(temp);
-            temp = new MultiLineBlock(this, prefix);
-            temp.setMdText(str);
-            blockList.add(cur, temp);
+        if(Utils.getPrefixAtLine(temp, 0) != 0){
+            prefix_len = Utils.getPrefixAtLine(temp, 0);
+            prefix = str.substring(temp.getIndentAtLine(0), temp.getIndentAtLine(0) + prefix_len);
+            boolean isPrefixOl = Utils.isOL(prefix);
+            if(temp instanceof SingleLineBlock){
+                blockList.remove(temp);
+                temp = new MultiLineBlock(this, prefix);
+                temp.setMdText(str);
+                blockList.add(idx, temp);
+            }
 
             while(str.indexOf("\n", nl_idx) != -1 || is_last_line){
                 if(is_last_line){
                     break;
                 }
                 sliced = str.substring(nl_idx, nl_idx + prefix_len);
-                if((!sliced.equals(prefix) && !Utils.isOL(prefix)) || (Utils.isOL(prefix) && !Utils.isOL(sliced))){
+                if((!sliced.equals(prefix) && !isPrefixOl) || (isPrefixOl && !Utils.isOL(sliced))){
                     newSingleStr = str.substring(nl_idx);
                     if(newSingleStr.endsWith("\n")){
                         newSingleStr = newSingleStr.substring(0, newSingleStr.length() - 1);
@@ -170,8 +172,8 @@ public class BlockManager {
                     newBlock.setMdText(newSingleStr);
                     curBlock.setMdText(newMultiStr);
                     blockList.remove(temp);
-                    blockList.add(cur, curBlock);
-                    blockList.add(cur + 1,newBlock);
+                    blockList.add(idx, curBlock);
+                    blockList.add(idx + 1,newBlock);
                     break;
                 }
                 nl_idx = str.indexOf("\n", nl_idx) + 1;
@@ -192,7 +194,7 @@ public class BlockManager {
                 }
                 SingleLineBlock newBlock = new SingleLineBlock(this);
                 newBlock.setMdText(newSingleStr);
-                blockList.add(cur,newBlock);
+                blockList.add(idx,newBlock);
                 temp.setMdText(str.substring(nl_idx+1));
             }
         }
@@ -236,15 +238,11 @@ public class BlockManager {
 
         int pos = (caretPos == -1 || caretPos > blockOnFocus.getMdText().length()) ?
                 blockOnFocus.getMdText().length() : Math.max(0, caretPos);
-        System.out.println("caretPos");
-        System.out.println(caretPos);
-        System.out.println("pos");
-        System.out.println(pos);
         SwingUtilities.invokeLater(()->{
             blockOnFocus.requestFocusInWindow();
             if(ContentType.equals("text/html"))
             {
-                blockOnFocus.setCaretPosition(blockOnFocus.getCaretPosition(pos));
+                blockOnFocus.setCaretPosition(pos);
             }
             else
             {
