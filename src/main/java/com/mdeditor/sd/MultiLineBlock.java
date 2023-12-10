@@ -145,8 +145,12 @@ public class MultiLineBlock extends Block {
     private String getNewLine(){
         String[] lines = getMdText().split("\n");
         int indent = getIndent();
-        String pref = lines[getWhichLine(lines, getCaretPosition())]
-                .substring(indent, indent + Utils.prefix_check(this));
+        int cur = getWhichLine(lines, getCaretPosition());
+        String pref = lines[cur]
+                .substring(indent, indent + Utils.getPrefixAtLine(this, cur));
+        if(pref.endsWith(".")){
+            pref = String.valueOf(Integer.parseInt(pref.substring(0, pref.length() - 1)) + 1) + ".";
+        }
         String ret = "\n" + " ".repeat(indent) + pref;
         if(!pref.isEmpty()){
             ret += " ";

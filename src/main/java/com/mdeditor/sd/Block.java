@@ -253,6 +253,17 @@ public class Block extends JTextPane {
         return countSpace(lines[getWhichLine(lines, caret)]);
     }
 
+    /**
+     * Returns the number of space at lineNum
+     * @param lineNum - Line which you want to check indent
+     * @return number of space
+     */
+    public int getIndentAtLine(int lineNum){
+        String[] lines = getMdText().split("\n");
+
+        return countSpace(lines[lineNum]);
+    }
+
     public int getWhichLine(String[] lines, int caret) {
         int totalChars = 0;
         for (int i = 0; i < lines.length; i++) {
@@ -274,6 +285,4 @@ public class Block extends JTextPane {
         }
         return cnt;
     }
-
-
 }
