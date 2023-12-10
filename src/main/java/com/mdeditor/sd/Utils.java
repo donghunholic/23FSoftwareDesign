@@ -80,7 +80,7 @@ public class Utils {
      */
     public static int prefix_check(Block block){
         String temp = block.getMdText();
-        int start = block.getIndent_level() * 2;
+        int start = block.getIndent();
         int end = temp.indexOf(" ", start);
         if (end == -1) return 0;
         String prefix = temp.substring(start, end);

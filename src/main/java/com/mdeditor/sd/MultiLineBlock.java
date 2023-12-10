@@ -74,15 +74,17 @@ public class MultiLineBlock extends Block {
                         text = text.stripTrailing();
                     }
 
-                    if(caret < text.length()){
+                    if(!isCaretInLastLine(caret)){
                         String insertStr = getNewLine();
                         getBlock().setText(text.substring(0,caret) + insertStr + text.substring(caret));
                         setCaretPosition(caret + insertStr.length());
                     }
                     else{
-                        String curLine = getLastLine(text);
-                        String pattern = "^[ ]*" + Pattern.quote(prefix) + "?[\n]*$";
-                        Pattern regex = Pattern.compile(pattern);
+                        String[] lines = getMdText().split("\n");
+                        String curLine = lines[getWhichLine(lines, caret)];
+                        String pref = curLine.substring(getIndent(), getIndent() + Utils.prefix_check(getBlock()));
+
+                        Pattern regex = Pattern.compile("^[ ]*" + Pattern.quote(pref) + "?[\n]*$");
                         if(regex.matcher(curLine).matches()){
                             getBlock().setText(text + "\n");
                             requestManager(BlockEvent.NEW_BLOCK, 0);
@@ -122,7 +124,6 @@ public class MultiLineBlock extends Block {
 
                 else if (e.getKeyCode() == KeyEvent.VK_TAB){
                     String[] lines = getText().split("\n");
-                    System.out.println(Arrays.toString(lines));
                     int caret = getCaretPosition();
                     int lineNum = getWhichLine(lines, caret);
                     if(lineNum == 0) return;
@@ -141,19 +142,16 @@ public class MultiLineBlock extends Block {
         });
     }
 
-    private static String getLastLine(String input) {
-        String[] lines = input.split("\n");
-
-        return Arrays.stream(lines)
-                .reduce((first, second) -> second)
-                .orElse("");
-    }
-
     private String getNewLine(){
         String[] lines = getMdText().split("\n");
-        int lineIdx = getWhichLine(lines, getCaretPosition());
-        return  "\n" + " ".repeat(Math.max(0, getIndent())) +
-                lines[lineIdx].substring(getIndent(),lines[lineIdx].indexOf(" ")) + " ";
+        int indent = getIndent();
+        String pref = lines[getWhichLine(lines, getCaretPosition())]
+                .substring(indent, indent + Utils.prefix_check(this));
+        String ret = "\n" + " ".repeat(indent) + pref;
+        if(!pref.isEmpty()){
+            ret += " ";
+        }
+        return ret;
     }
 
     public void setType(MultiLine type) {

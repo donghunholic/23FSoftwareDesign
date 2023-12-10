@@ -15,11 +15,7 @@ public class Block extends JTextPane {
 
     private String mdText;
     private BlockManager blockManager;
-
-    public final String indent = "  ";
     private int indent_level;
-
-    //protected int PreCaretPosition;
     protected int CaretPosition;
 
     public Block(BlockManager manager){
@@ -27,8 +23,7 @@ public class Block extends JTextPane {
         this.setEditable(true);
         this.blockManager = manager;
         this.indent_level = 0;
-        //PreCaretPosition=0;
-        CaretPosition=0;
+        this.CaretPosition=0;
 
         this.addMouseListener(new MouseListener() {
             @Override

@@ -72,7 +72,6 @@ public class BlockManager {
                 else return;
             }
             case OUTFOCUS_CLICKED ->{
-
                 if(blockOnFocus != blockList.get(idx)){
                     //blockOnFocus = blockList.get(idx);
                     manageBlock(idx);
@@ -127,9 +126,8 @@ public class BlockManager {
      * @param idx - the integer of Block's index. Must have value between 0 ~ BlockList.length()
      */
     public void BlockParse(int idx){
-        int cur = idx;
         int nl_idx = 0;
-        Block temp = this.blockList.get(cur);
+        Block temp = this.blockList.get(idx);
         String str = temp.getMdText();
         String prefix = "";
         String newSingleStr = "";
@@ -139,11 +137,11 @@ public class BlockManager {
         boolean is_last_line = false;
         if(Utils.prefix_check(temp) != 0){
             prefix_len = Utils.prefix_check(temp);
-            prefix = str.substring(temp.getIndent_level() * 2, temp.getIndent_level() * 2 + prefix_len);
+            prefix = str.substring(temp.getIndent(), temp.getIndent() + prefix_len);
             blockList.remove(temp);
             temp = new MultiLineBlock(this, prefix);
             temp.setMdText(str);
-            blockList.add(cur, temp);
+            blockList.add(idx, temp);
 
             while(str.indexOf("\n", nl_idx) != -1 || is_last_line){
                 if(is_last_line){
@@ -164,8 +162,8 @@ public class BlockManager {
                     newBlock.setMdText(newSingleStr);
                     curBlock.setMdText(newMultiStr);
                     blockList.remove(temp);
-                    blockList.add(cur, curBlock);
-                    blockList.add(cur + 1,newBlock);
+                    blockList.add(idx, curBlock);
+                    blockList.add(idx + 1,newBlock);
                     break;
                 }
                 nl_idx = str.indexOf("\n", nl_idx) + 1;
@@ -186,7 +184,7 @@ public class BlockManager {
                 }
                 SingleLineBlock newBlock = new SingleLineBlock(this);
                 newBlock.setMdText(newSingleStr);
-                blockList.add(cur,newBlock);
+                blockList.add(idx,newBlock);
                 temp.setMdText(str.substring(nl_idx+1));
             }
         }
