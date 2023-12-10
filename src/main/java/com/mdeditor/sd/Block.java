@@ -15,14 +15,12 @@ public class Block extends JTextPane {
 
     private String mdText;
     private BlockManager blockManager;
-    private int indent_level;
     protected int CaretPosition;
 
     public Block(BlockManager manager){
         this.mdText = "";
         this.setEditable(true);
         this.blockManager = manager;
-        this.indent_level = 0;
         this.CaretPosition=0;
 
         this.addMouseListener(new MouseListener() {
@@ -123,14 +121,6 @@ public class Block extends JTextPane {
     public void destruct(){
         mdText = null;
         blockManager = null;
-    }
-
-    public void setIndent_level(int level){
-        indent_level = level;
-    }
-
-    public int getIndent_level(){
-        return this.indent_level;
     }
 
     public int getCaretPosition(int position){
@@ -250,7 +240,7 @@ public class Block extends JTextPane {
         int caret = getCaretPosition();
         String[] lines = getMdText().split("\n");
 
-        return countSpace(lines[getWhichLine(lines, caret)]);
+        return countSpace(lines[getWhichLine(lines)]);
     }
 
     /**
@@ -264,7 +254,8 @@ public class Block extends JTextPane {
         return countSpace(lines[lineNum]);
     }
 
-    public int getWhichLine(String[] lines, int caret) {
+    public int getWhichLine(String[] lines) {
+        int caret = getCaretPosition();
         int totalChars = 0;
         for (int i = 0; i < lines.length; i++) {
             totalChars += lines[i].length() + 1;

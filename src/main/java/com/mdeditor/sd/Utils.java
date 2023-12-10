@@ -114,6 +114,24 @@ public class Utils {
         else return 0;
     }
 
+    public static String getPrefix(Block block, int whichLine){
+        String curLine = block.getMdText().split("\n")[whichLine];
+        int start = block.getIndentAtLine(whichLine);
+        int end = curLine.indexOf(" ", start);
+        if (end == -1) return "";
+        String prefix = curLine.substring(start, end);
+        if(prefix.equals(">") || prefix.equals("-") || prefix.equals("+")|| prefix.equals("*")) return prefix;
+        else if (prefix.endsWith(".")){
+            try {
+                Integer.parseInt(prefix.substring(0, prefix.length() - 1));
+                return prefix;
+            } catch (NumberFormatException e) {
+                return "";
+            }
+        }
+        else return "";
+    }
+
     public boolean table_check(Block block){
         String temp = block.getMdText();
         if (temp.startsWith("|") && temp.endsWith("|")) {}

@@ -135,13 +135,16 @@ public class BlockManager {
         String sliced = "";
         int prefix_len = 0;
         boolean is_last_line = false;
-        if(Utils.prefix_check(temp) != 0){
-            prefix_len = Utils.prefix_check(temp);
-            prefix = str.substring(temp.getIndent(), temp.getIndent() + prefix_len);
-            blockList.remove(temp);
-            temp = new MultiLineBlock(this, prefix);
-            temp.setMdText(str);
-            blockList.add(idx, temp);
+        if(Utils.getPrefixAtLine(temp, 0) != 0){
+            prefix_len = Utils.getPrefixAtLine(temp, 0);
+            prefix = str.substring(temp.getIndentAtLine(0), temp.getIndentAtLine(0) + prefix_len);
+            boolean isPrefixOl = Utils.isOL(prefix);
+            if(temp instanceof SingleLineBlock){
+                blockList.remove(temp);
+                temp = new MultiLineBlock(this, prefix);
+                temp.setMdText(str);
+                blockList.add(idx, temp);
+            }
 
             while(str.indexOf("\n", nl_idx) != -1 || is_last_line){
                 if(is_last_line){

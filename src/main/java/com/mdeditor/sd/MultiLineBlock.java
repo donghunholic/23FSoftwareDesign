@@ -81,7 +81,7 @@ public class MultiLineBlock extends Block {
                     }
                     else{
                         String[] lines = getMdText().split("\n");
-                        String curLine = lines[getWhichLine(lines, caret)];
+                        String curLine = lines[getWhichLine(lines)];
                         String pref = curLine.substring(getIndent(), getIndent() + Utils.prefix_check(getBlock()));
 
                         Pattern regex = Pattern.compile("^[ ]*" + Pattern.quote(pref) + "?[\n]*$");
@@ -125,7 +125,7 @@ public class MultiLineBlock extends Block {
                 else if (e.getKeyCode() == KeyEvent.VK_TAB){
                     String[] lines = getText().split("\n");
                     int caret = getCaretPosition();
-                    int lineNum = getWhichLine(lines, caret);
+                    int lineNum = getWhichLine(lines);
                     if(lineNum == 0) return;
                     StringBuilder newText = new StringBuilder();
                     for(int i = 0; i < lines.length; i++){
@@ -145,7 +145,7 @@ public class MultiLineBlock extends Block {
     private String getNewLine(){
         String[] lines = getMdText().split("\n");
         int indent = getIndent();
-        int cur = getWhichLine(lines, getCaretPosition());
+        int cur = getWhichLine(lines);
         String pref = lines[cur]
                 .substring(indent, indent + Utils.getPrefixAtLine(this, cur));
         if(pref.endsWith(".")){
