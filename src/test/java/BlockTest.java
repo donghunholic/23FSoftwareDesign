@@ -58,4 +58,14 @@ public class BlockTest {
     void testRequestFocusInWindow() {
         assertFalse(block.requestFocusInWindow());
     }
+
+    @Test
+    void testgetCaretPosition() {
+        block.setMdText("- how\n- how\n  - ab cd A\n  - ab cd B");
+        assertEquals(19,block.getCaretPosition(12));
+        assertEquals(23,block.getCaretPosition(16));
+        assertEquals(31,block.getCaretPosition(20));
+        assertEquals(34,block.getCaretPosition(23));
+        assertEquals(35,block.getCaretPosition(24));
+    }
 }
