@@ -1,19 +1,12 @@
 import com.mdeditor.sd.Block;
 import com.mdeditor.sd.BlockEvent;
 import com.mdeditor.sd.BlockManager;
-import com.mdeditor.sd.Utils;
 import org.jsoup.Jsoup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 
 import javax.swing.*;
-import javax.swing.event.CaretEvent;
-import javax.swing.text.Caret;
-import java.awt.*;
 import java.awt.event.MouseEvent;
-import java.lang.reflect.InvocationTargetException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -110,23 +103,13 @@ public class BlockTest {
     }
 
     @Test
-    void testMouseEventHandler() throws InterruptedException, InvocationTargetException {
+    void testMouseEventHandler() {
         assertDoesNotThrow(() -> {
-            SwingUtilities.invokeAndWait(() -> {
-                block.dispatchEvent(new MouseEvent(block, MouseEvent.MOUSE_CLICKED, System.currentTimeMillis(), 0, 0, 0, 0, true, MouseEvent.BUTTON1));
-            });
-            SwingUtilities.invokeAndWait(() -> {
-                block.dispatchEvent(new MouseEvent(block, MouseEvent.MOUSE_PRESSED, System.currentTimeMillis(), 0, 0, 0, 0, true, MouseEvent.BUTTON1));
-            });
-            SwingUtilities.invokeAndWait(() -> {
-                block.dispatchEvent(new MouseEvent(block, MouseEvent.MOUSE_RELEASED, System.currentTimeMillis(), 0, 0, 0, 0, true, MouseEvent.BUTTON1));
-            });
-            SwingUtilities.invokeAndWait(() -> {
-                block.dispatchEvent(new MouseEvent(block, MouseEvent.MOUSE_ENTERED, System.currentTimeMillis(), 0, 0, 0, 0, true, MouseEvent.BUTTON1));
-            });
-            SwingUtilities.invokeAndWait(() -> {
-                block.dispatchEvent(new MouseEvent(block, MouseEvent.MOUSE_EXITED, System.currentTimeMillis(), 0, 0, 0, 0, true, MouseEvent.BUTTON1));
-            });
+            SwingUtilities.invokeAndWait(() -> block.dispatchEvent(new MouseEvent(block, MouseEvent.MOUSE_CLICKED, System.currentTimeMillis(), 0, 0, 0, 0, true, MouseEvent.BUTTON1)));
+            SwingUtilities.invokeAndWait(() -> block.dispatchEvent(new MouseEvent(block, MouseEvent.MOUSE_PRESSED, System.currentTimeMillis(), 0, 0, 0, 0, true, MouseEvent.BUTTON1)));
+            SwingUtilities.invokeAndWait(() -> block.dispatchEvent(new MouseEvent(block, MouseEvent.MOUSE_RELEASED, System.currentTimeMillis(), 0, 0, 0, 0, true, MouseEvent.BUTTON1)));
+            SwingUtilities.invokeAndWait(() -> block.dispatchEvent(new MouseEvent(block, MouseEvent.MOUSE_ENTERED, System.currentTimeMillis(), 0, 0, 0, 0, true, MouseEvent.BUTTON1)));
+            SwingUtilities.invokeAndWait(() -> block.dispatchEvent(new MouseEvent(block, MouseEvent.MOUSE_EXITED, System.currentTimeMillis(), 0, 0, 0, 0, true, MouseEvent.BUTTON1)));
         });
         verify(manager, atMost(1)).update(block, BlockEvent.OUTFOCUS_CLICKED, block.getCaretPosition());
     }

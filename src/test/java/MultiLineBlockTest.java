@@ -1,7 +1,6 @@
 import com.mdeditor.sd.BlockEvent;
 import com.mdeditor.sd.BlockManager;
 import com.mdeditor.sd.MultiLineBlock;
-import com.mdeditor.sd.SingleLineBlock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

@@ -1,8 +1,6 @@
 import com.mdeditor.sd.Block;
 import com.mdeditor.sd.BlockManager;
 import com.mdeditor.sd.Utils;
-import com.vladsch.flexmark.util.sequence.BasedSequence;
-import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,11 +8,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import com.vladsch.flexmark.util.ast.Node;
 import org.mockito.Mock;
-
-import java.nio.file.Files;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Scanner;
 
 import static org.junit.jupiter.api.Assertions.*;
 

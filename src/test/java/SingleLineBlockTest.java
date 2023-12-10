@@ -1,17 +1,10 @@
 import com.mdeditor.sd.*;
-import org.junit.Before;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.swing.*;
-import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.lang.reflect.InvocationTargetException;
 
-import static java.lang.Thread.sleep;
 import static org.mockito.Mockito.mock;
 
 import static org.junit.jupiter.api.Assertions.*;
