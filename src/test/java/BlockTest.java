@@ -112,5 +112,14 @@ public class BlockTest {
             SwingUtilities.invokeAndWait(() -> block.dispatchEvent(new MouseEvent(block, MouseEvent.MOUSE_EXITED, System.currentTimeMillis(), 0, 0, 0, 0, true, MouseEvent.BUTTON1)));
         });
         verify(manager, atMost(1)).update(block, BlockEvent.OUTFOCUS_CLICKED, block.getCaretPosition());
+
+    @Test
+    void testgetCaretPosition() {
+        block.setMdText("- how\n- how\n  - ab cd A\n  - ab cd B");
+        assertEquals(19,block.getCaretPosition(12));
+        assertEquals(23,block.getCaretPosition(16));
+        assertEquals(31,block.getCaretPosition(20));
+        assertEquals(34,block.getCaretPosition(23));
+        assertEquals(35,block.getCaretPosition(24));
     }
 }

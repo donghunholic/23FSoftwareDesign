@@ -84,7 +84,7 @@ public class Utils {
         int end = temp.indexOf(" ", start);
         if (end == -1) return 0;
         String prefix = temp.substring(start, end);
-        if(prefix.equals(">") || prefix.equals("-")) return 1;
+        if(prefix.equals(">") || prefix.equals("-") || prefix.equals("+")|| prefix.equals("*")) return 1;
         else if (prefix.endsWith(".")){
             try {
                  Integer.parseInt(prefix.substring(0, prefix.length() - 1));

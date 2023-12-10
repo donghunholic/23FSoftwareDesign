@@ -56,25 +56,29 @@ public class BlockManager {
             }
             case OUTFOCUS_BLOCK_UP -> {
                 if(idx > 0){
+                    this.blockOnFocus = blockList.get(idx-1);
                     manageBlock(idx);
                     blockList.get(idx).renderHTML();
-                    this.blockOnFocus = blockList.get(idx-1);
+                    //this.blockOnFocus = blockList.get(idx-1);
                     caretPos = Math.max(0, blockOnFocus.getMdText().lastIndexOf('\n')) + pos;
                 }
             }
             case OUTFOCUS_BLOCK_DOWN -> {
                 if(idx < blockList.size()-1){
+                    this.blockOnFocus = blockList.get(idx+1);
                     manageBlock(idx);
                     blockList.get(idx).renderHTML();
-                    this.blockOnFocus = blockList.get(idx+1);
+                    //this.blockOnFocus = blockList.get(idx+1);
                 }
             }
             case OUTFOCUS_CLICKED ->{
 
                 if(blockOnFocus != blockList.get(idx)){
+                    //blockOnFocus = blockList.get(idx);
                     manageBlock(idx);
                     blockOnFocus.renderHTML();
                     blockOnFocus = blockList.get(idx);
+                    blockOnFocus.setContentType("text/html");
                 }
             }
             case TRANSFORM_MULTI -> {
@@ -146,9 +150,15 @@ public class BlockManager {
                     break;
                 }
                 sliced = str.substring(nl_idx, nl_idx + prefix_len);
-                if(!sliced.equals(prefix) && (Utils.isOL(prefix) && !Utils.isOL(sliced))){
+                if((!sliced.equals(prefix) && !Utils.isOL(prefix)) || (Utils.isOL(prefix) && !Utils.isOL(sliced))){
                     newSingleStr = str.substring(nl_idx);
+                    if(newSingleStr.endsWith("\n")){
+                        newSingleStr = newSingleStr.substring(0, newSingleStr.length() - 1);
+                    }
                     newMultiStr = str.substring(0,nl_idx);
+                    if(newMultiStr.endsWith("\n")){
+                        newMultiStr = newMultiStr.substring(0, newMultiStr.length() - 1);
+                    }
                     MultiLineBlock curBlock = new MultiLineBlock(this, prefix);
                     SingleLineBlock newBlock = new SingleLineBlock(this);
                     newBlock.setMdText(newSingleStr);
@@ -171,6 +181,9 @@ public class BlockManager {
             if(!is_last_line){
                 nl_idx = str.indexOf("\n", nl_idx);
                 newSingleStr = str.substring(0, nl_idx + 1);
+                if(newSingleStr.endsWith("\n")){
+                    newSingleStr = newSingleStr.substring(0, newSingleStr.length() - 1);
+                }
                 SingleLineBlock newBlock = new SingleLineBlock(this);
                 newBlock.setMdText(newSingleStr);
                 blockList.add(cur,newBlock);
@@ -206,6 +219,7 @@ public class BlockManager {
     }
 
     public void renderAll(int caretPos){
+        String ContentType=blockOnFocus.getContentType();
         for(Block block : blockList){
             if(block != blockOnFocus && !block.getContentType().equals("text/html")){
                 block.renderHTML();
@@ -214,11 +228,22 @@ public class BlockManager {
 
         mdEditor.updateUI();
 
-        int pos = caretPos == -1 || caretPos > blockOnFocus.getMdText().length() ?
+        int pos = (caretPos == -1 || caretPos > blockOnFocus.getMdText().length()) ?
                 blockOnFocus.getMdText().length() : Math.max(0, caretPos);
+        System.out.println("caretPos");
+        System.out.println(caretPos);
+        System.out.println("pos");
+        System.out.println(pos);
         SwingUtilities.invokeLater(()->{
             blockOnFocus.requestFocusInWindow();
-            blockOnFocus.setCaretPosition(pos);
+            if(ContentType.equals("text/html"))
+            {
+                blockOnFocus.setCaretPosition(blockOnFocus.getCaretPosition(pos));
+            }
+            else
+            {
+                blockOnFocus.setCaretPosition(pos);
+            }
         });
     }
 
@@ -273,23 +298,37 @@ public class BlockManager {
             if(cur instanceof MultiLineBlock && up instanceof MultiLineBlock){
                 if(Objects.equals(((MultiLineBlock) cur).prefix, ((MultiLineBlock) up).prefix) || (Utils.isOL(((MultiLineBlock) cur).prefix)) && Utils.isOL(((MultiLineBlock) up).prefix)){
                     up.setMdText(up.getMdText() + "\n" + cur.getMdText());
+                    if(blockOnFocus == cur){
+                        blockOnFocus = blockList.get(cur_idx + 1);
+                        SwingUtilities.invokeLater(()->{
+                            blockOnFocus.requestFocusInWindow();
+                        });
+                    }
                     blockList.remove(cur);
                     cur_idx--;
                     mergeBlock(cur_idx);
                 }
             }
         }
-        if(idx < blockList.size()){
+        if(idx < blockList.size() - 1){
             cur = blockList.get(cur_idx);
             down = blockList.get(cur_idx + 1);
             if(cur instanceof MultiLineBlock && down instanceof MultiLineBlock){
                 if(Objects.equals(((MultiLineBlock) cur).prefix, ((MultiLineBlock) down).prefix) || (Utils.isOL(((MultiLineBlock) cur).prefix)) && Utils.isOL(((MultiLineBlock) down).prefix)){
                     cur.setMdText(cur.getMdText() + "\n" + down.getMdText());
+                    if(blockOnFocus == down){
+                        blockOnFocus = cur;
+                        SwingUtilities.invokeLater(()->{
+                            blockOnFocus.requestFocusInWindow();
+                        });
+                    }
                     blockList.remove(down);
                     mergeBlock(cur_idx);
                 }
             }
         }
+        blockList.get(cur_idx).renderMD();
+        blockList.get(cur_idx).renderHTML();
     }
 
     public void manageBlock(int idx){
