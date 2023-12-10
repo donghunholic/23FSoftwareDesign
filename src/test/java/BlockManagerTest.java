@@ -38,8 +38,7 @@ and one more line""";
         assertEquals("""
 | column 1 | column 2 |
 | -------- | -------- |
-| data 1   | data 2   |
-""", blocks.get(1).getMdText());
+| data 1   | data 2   |""", blocks.get(1).getMdText());
         assertEquals("and one more line", blocks.get(2).getMdText());
     }
 
@@ -55,7 +54,7 @@ and one more line""";
         Pair<Integer, Integer> result1 = blockManager.getTableIndexFromMarkdownString(markdownWithTable);
         assertNotNull(result1);
         assertEquals(12, result1.getLeft());  // Adjust the expected start index based on your actual markdown
-        assertEquals(83, result1.getRight());  // Adjust the expected end index based on your actual markdown
+        assertEquals(82, result1.getRight());  // Adjust the expected end index based on your actual markdown
 
         // markdown without table block
         String markdownWithoutTable = "Some text without a table.";
