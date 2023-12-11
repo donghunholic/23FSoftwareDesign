@@ -61,7 +61,7 @@ public class Utils {
     public static String stringToHtmlWithCss(String string){
         Document doc = Jsoup.parse(stringToHtml(string));
         doc.head().html(style);
-        doc.body().addClass("markdown-body");
+        //doc.body().addClass("markdown-body");
         return doc.outerHtml();
     }
 
@@ -84,7 +84,7 @@ public class Utils {
         int end = temp.indexOf(" ", start);
         if (end == -1) return 0;
         String prefix = temp.substring(start, end);
-        if(prefix.equals(">") || prefix.equals("-") || prefix.equals("+")|| prefix.equals("*")) return 1;
+        if(prefix.equals(">") || prefix.equals("-") || prefix.equals("+")|| prefix.equals("*")) return 1;               //TODO: make regular expression of nested quote.
         else if (prefix.endsWith(".")){
             try {
                  Integer.parseInt(prefix.substring(0, prefix.length() - 1));
@@ -152,7 +152,7 @@ public class Utils {
 
     public static boolean isBlockStringMultiline(Block block){
         String temp = block.getText();
-        int start = block.getIndent_level() * 2;
+        int start = block.getIndent();
         int end = temp.indexOf(" ", start);
         if (end == -1) return false;
         String prefix = temp.substring(start, end);
