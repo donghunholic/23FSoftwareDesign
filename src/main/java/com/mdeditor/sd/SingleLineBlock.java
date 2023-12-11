@@ -31,6 +31,9 @@ public class SingleLineBlock extends Block {
                 {
                     CaretPosition=getCaretPosition();
                 }
+                if(e.getKeyCode() == KeyEvent.VK_ENTER){
+                    e.consume();
+                }
             }
 
             @Override

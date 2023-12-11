@@ -60,6 +60,7 @@ public class BlockManager {
                     manageBlock(idx);
                     blockList.get(idx).renderHTML();
                     caretPos = Math.max(0, blockOnFocus.getMdText().lastIndexOf('\n')) + pos;
+                    //TODO: calc proper caret position
                 }
                 else return;
             }
@@ -68,23 +69,24 @@ public class BlockManager {
                     this.blockOnFocus = blockList.get(idx+1);
                     manageBlock(idx);
                     blockList.get(idx).renderHTML();
+                    //TODO: calc proper caret position
                 }
                 else return;
             }
             case OUTFOCUS_CLICKED ->{
                 if(blockOnFocus != blockList.get(idx)){
-                    //blockOnFocus = blockList.get(idx);
-                    manageBlock(idx);
+                    Block tmpFocus = blockList.get(idx);
+                    manageBlock(blockList.indexOf(blockOnFocus));
                     blockOnFocus.renderHTML();
-                    blockOnFocus = blockList.get(idx);
+                    blockOnFocus = tmpFocus;
                     blockOnFocus.setContentType("text/html");
-                    caretPos = blockOnFocus.getCaretPosition(pos);
+                    //caretPos = blockOnFocus.getCaretPosition(pos);
                 }
             }
             case TRANSFORM_MULTI -> {
                 Block newBlock = new MultiLineBlock(this, "");
-                newBlock.setMdText(block.getMdText() + "\n"); // TODO: append prefix in cursor
-
+                String pre = Utils.getPrefix(block, 0);
+                newBlock.setMdText(block.getMdText() + "\n" + pre + " "); // TODO: append prefix in cursor
                 blockList.add(idx, newBlock);
                 blockList.remove(block);
                 block.destruct();
