@@ -7,9 +7,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import javax.swing.*;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 
 public class BlockManager {
@@ -145,7 +143,7 @@ public class BlockManager {
      * parse the block which is at BlockList[idx]
      * @param idx - the integer of Block's index. Must have value between 0 ~ BlockList.length()
      */
-    public void BlockParse(int idx){
+    public void blockParse(int idx){
         int nl_idx = 0;
         Block temp = this.blockList.get(idx);
         String str = temp.getMdText();
@@ -155,66 +153,89 @@ public class BlockManager {
         String sliced = "";
         int prefix_len = 0;
         boolean is_last_line = false;
-        if(Utils.getPrefixAtLine(temp, 0) != 0){
-            prefix_len = Utils.getPrefixAtLine(temp, 0);
-            prefix = str.substring(temp.getIndentAtLine(0), temp.getIndentAtLine(0) + prefix_len);
+        //----------------- From here
+        if(!Utils.getPrefix(temp, 0).isEmpty()) {
+            prefix = Utils.getPrefix(temp, 0);
+            prefix_len = prefix.length();
             boolean isPrefixOl = Utils.isOL(prefix);
-            if(temp instanceof SingleLineBlock){
+            if (temp instanceof SingleLineBlock) {
                 blockList.remove(temp);
                 temp = new MultiLineBlock(this, prefix);
                 temp.setMdText(str);
                 blockList.add(idx, temp);
             }
+            //--------------- To here: Still needed, although we implemented 'TRANSFORM_MULTI'?
 
-            while(str.indexOf("\n", nl_idx) != -1 || is_last_line){
-                if(is_last_line){
+            String[] lines = str.split("\n");
+            List<String> prefixes = new ArrayList<>();
+            List<Block> blocks = new LinkedList<>();
+            for (int i = 0; i < lines.length; i++) {
+                prefixes.add(Utils.getPrefix(temp, i));
+            }
+
+            // check if every line has the same prefix
+            boolean flag = true;
+            for (String pre : prefixes) {
+                if (!pre.equals(prefixes.get(0)) || (Utils.isOL(pre) && Utils.isOL(prefixes.get(0)))) {
+                    flag = false;
                     break;
                 }
-                sliced = str.substring(nl_idx, nl_idx + prefix_len);
-                if((!sliced.equals(prefix) && !isPrefixOl) || (isPrefixOl && !Utils.isOL(sliced))){
-                    newSingleStr = str.substring(nl_idx);
-                    if(newSingleStr.endsWith("\n")){
-                        newSingleStr = newSingleStr.substring(0, newSingleStr.length() - 1);
-                    }
-                    newMultiStr = str.substring(0,nl_idx);
-                    if(newMultiStr.endsWith("\n")){
-                        newMultiStr = newMultiStr.substring(0, newMultiStr.length() - 1);
-                    }
-                    MultiLineBlock curBlock = new MultiLineBlock(this, prefix);
-                    SingleLineBlock newBlock = new SingleLineBlock(this);
-                    newBlock.setMdText(newSingleStr);
-                    curBlock.setMdText(newMultiStr);
-                    blockList.remove(temp);
-                    blockList.add(idx, curBlock);
-                    blockList.add(idx + 1,newBlock);
-                    break;
-                }
-                nl_idx = str.indexOf("\n", nl_idx) + 1;
-                if(str.indexOf("\n", nl_idx + 1) == -1){
-                    is_last_line = true;
-                }
             }
-        }
-        else{
-            if(str.indexOf("\n", nl_idx) == -1){
-                is_last_line = true;
-            }
-            if(!is_last_line){
-                nl_idx = str.indexOf("\n", nl_idx);
-                newSingleStr = str.substring(0, nl_idx + 1);
-                if(newSingleStr.endsWith("\n")){
-                    newSingleStr = newSingleStr.substring(0, newSingleStr.length() - 1);
-                }
-                SingleLineBlock newBlock = new SingleLineBlock(this);
-                newBlock.setMdText(newSingleStr);
-                blockList.add(idx,newBlock);
-                temp.setMdText(str.substring(nl_idx+1));
-            }
-        }
+            if (flag) return;
 
-        //TODO: Stack Overflow happens when there is indentation inside multilineblock
-        if(!is_last_line && (idx < blockList.size() - 1)){
-            BlockParse(idx+1);
+            String curPre = "";
+            int fromIdx = -1;
+            for (int i = 0; i < lines.length; i++) {
+                String pre = prefixes.get(i);
+
+                // If this line has no prefix -> SingleLine
+                if (pre.isEmpty()) {
+                    if (!curPre.isEmpty()) {
+                        Block newMulti = new MultiLineBlock(this, curPre);
+                        String newMdText = String.join("\n", Arrays.copyOfRange(lines, fromIdx, i));
+                        newMulti.setMdText(newMdText);
+                        blocks.add(newMulti);
+
+                        curPre = pre;
+                    }
+                    Block newSingle = new SingleLineBlock(this);
+                    newSingle.setMdText(lines[i]);
+                    blocks.add(newSingle);
+                }
+                // If this line has prefix -> MultiLine
+                else {
+                    // New Start
+                    if (curPre.isEmpty()) {
+                        curPre = pre;
+                        fromIdx = i;
+                    }
+                    // Already started
+                    else {
+                        // Same prefix
+                        if (curPre.equals(pre) || (Utils.isOL(pre) && Utils.isOL(curPre))) continue;
+
+                        // If different prefix, renew parse
+                        Block newMulti = new MultiLineBlock(this, curPre);
+                        String newMdText = String.join("\n", Arrays.copyOfRange(lines, fromIdx, i));
+                        newMulti.setMdText(newMdText);
+                        blocks.add(newMulti);
+
+                        // New Start
+                        curPre = pre;
+                        fromIdx = i;
+
+                    }
+                }
+            }
+            if (!curPre.isEmpty()) {
+                Block newMulti = new MultiLineBlock(this, curPre);
+                String newMdText = String.join("\n", Arrays.copyOfRange(lines, fromIdx, lines.length));
+                newMulti.setMdText(newMdText);
+                blocks.add(newMulti);
+            }
+
+            blockList.remove(temp);
+            blockList.addAll(idx, blocks);
         }
     }
 
@@ -363,7 +384,7 @@ public class BlockManager {
      * @param idx block index which will be focused out
      */
     public void manageBlock(int idx){
-        BlockParse(idx);
+        blockParse(idx);
         mergeBlock(idx);
     }
 }
