@@ -111,7 +111,7 @@ public class BlockManager {
                 blockList.remove(block);
                 block.destruct();
             }
-            default -> { throw new IllegalStateException("Unexpected value: " + e); }
+            default -> throw new IllegalStateException("Unexpected value: " + e);
         }
         renderAll(caretPos);
     }
@@ -144,29 +144,10 @@ public class BlockManager {
      * @param idx - the integer of Block's index. Must have value between 0 ~ BlockList.length()
      */
     public void blockParse(int idx){
-        int nl_idx = 0;
         Block temp = this.blockList.get(idx);
-        String str = temp.getMdText();
-        String prefix = "";
-        String newSingleStr = "";
-        String newMultiStr = "";
-        String sliced = "";
-        int prefix_len = 0;
-        boolean is_last_line = false;
-        //----------------- From here
-        if(!Utils.getPrefix(temp, 0).isEmpty()) {
-            prefix = Utils.getPrefix(temp, 0);
-            prefix_len = prefix.length();
-            boolean isPrefixOl = Utils.isOL(prefix);
-            if (temp instanceof SingleLineBlock) {
-                blockList.remove(temp);
-                temp = new MultiLineBlock(this, prefix);
-                temp.setMdText(str);
-                blockList.add(idx, temp);
-            }
-            //--------------- To here: Still needed, although we implemented 'TRANSFORM_MULTI'?
 
-            String[] lines = str.split("\n");
+        if(temp instanceof MultiLineBlock) {
+            String[] lines = temp.getMdText().split("\n");
             List<String> prefixes = new ArrayList<>();
             List<Block> blocks = new LinkedList<>();
             for (int i = 0; i < lines.length; i++) {
