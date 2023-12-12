@@ -64,23 +64,21 @@ public class MultiLineBlock extends Block {
             @Override
             public void keyReleased(KeyEvent e) {
                 if(e.getKeyCode() == KeyEvent.VK_ENTER){
-                    if(!Utils.isBlockStringMultiline(getThis())){
+                    requestManager(BlockEvent.UPDATE_BLOCK, getCaretPosition());
+                    if(!Utils.isBlockStringMultiline(getBlock()) && !getMdText().contains("\n")){
                         requestManager(BlockEvent.NEW_BLOCK, getCaretPosition());
                         requestManager(BlockEvent.TRANSFORM_SINGLE, getCaretPosition());
                         return;
                     }
 
-                    requestManager(BlockEvent.UPDATE_BLOCK, getCaretPosition());
 
                     String text = getMdText();
                     int caret = getCaretPosition();
-
                     if(caret > text.length()){
                         caret = text.length();
-                        text = text.stripTrailing();
                     }
 
-                    if(!isCaretInLastLine(caret)){
+                    if(caret < text.length()){
                         String insertStr = getNewLine();
                         getBlock().setText(text.substring(0,caret) + insertStr + text.substring(caret));
                         setCaretPosition(caret + insertStr.length());
@@ -88,11 +86,9 @@ public class MultiLineBlock extends Block {
                     else{
                         String[] lines = getMdText().split("\n");
                         String curLine = lines[getWhichLine(lines)];
-                        String pref = curLine.substring(getIndent(), getIndent() + Utils.prefix_check(getBlock()));
-
-                        Pattern regex = Pattern.compile("^[ ]*" + Pattern.quote(pref) + "?[\n]*$");
+                        String pref = Utils.getPrefix(getBlock(), getWhichLine(lines));
+                        Pattern regex = Pattern.compile("^[ ]*" + Pattern.quote(pref) + "?[ ]*$");
                         if(regex.matcher(curLine).matches()){
-                            getBlock().setText(text + "\n");
                             requestManager(BlockEvent.NEW_BLOCK, 0);
                         }
                         else{
@@ -152,8 +148,7 @@ public class MultiLineBlock extends Block {
         String[] lines = getMdText().split("\n");
         int indent = getIndent();
         int cur = getWhichLine(lines);
-        String pref = lines[cur]
-                .substring(indent, indent + Utils.getPrefixAtLine(this, cur));
+        String pref = Utils.getPrefix(this, cur);
         if(pref.endsWith(".")){
             pref = String.valueOf(Integer.parseInt(pref.substring(0, pref.length() - 1)) + 1) + ".";
         }
