@@ -3,6 +3,7 @@ package com.mdeditor.sd;
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -22,6 +23,7 @@ public class Block extends JTextPane {
         this.setEditable(true);
         this.blockManager = manager;
         this.CaretPosition=0;
+        this.setFont(new Font("Jetbrains Mono", Font.PLAIN, 18));
 
         this.addMouseListener(new MouseListener() {
             @Override
@@ -123,9 +125,14 @@ public class Block extends JTextPane {
         blockManager = null;
     }
 
+    /**
+     * Function to correct caret difference before and after block's content type change
+     * @param position - primitive caret position (in HTML format)
+     * @return caret position in MD format
+     */
     public int getCaretPosition(int position){
         if (mdText == null || mdText.isEmpty() || position < 0 || position > mdText.length()) {
-            return -1;
+            return 0;
         }
 
 
@@ -168,8 +175,7 @@ public class Block extends JTextPane {
         }
         prefixLength++;
 
-        int adjustedPosition = (position - 1) + prefixLength;
-        return adjustedPosition;
+        return (position - 1) + prefixLength;
     }
 
     private int MarkdownQuotePosition(int position) {
@@ -178,8 +184,7 @@ public class Block extends JTextPane {
             return position;
         }
 
-        int adjustedPosition = (position - 1) + prefixLength;
-        return adjustedPosition;
+        return (position - 1) + prefixLength;
     }
 
     private int getPrefixLength(char prefix) {
@@ -236,6 +241,9 @@ public class Block extends JTextPane {
         return position;
     }
 
+    /**
+     * @return Number of spaces(indent) where the cursor is
+     */
     public int getIndent() {
         String[] lines = getMdText().split("\n");
         return countSpace(lines[getWhichLine(lines)]);
@@ -273,9 +281,5 @@ public class Block extends JTextPane {
             else break;
         }
         return cnt;
-    }
-
-    public Block getThis(){
-        return this;
     }
 }

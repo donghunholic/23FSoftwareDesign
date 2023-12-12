@@ -93,6 +93,9 @@ public class BlockManager {
             case TRANSFORM_MULTI -> {
                 Block newBlock = new MultiLineBlock(this, "");
                 String pre = Utils.getPrefix(block, 0);
+                if(Utils.isOL(pre)){
+                    pre = String.valueOf(Integer.parseInt(pre.substring(0, pre.length() - 1)) + 1) + ".";
+                }
                 newBlock.setMdText(block.getMdText() + "\n" + pre + " ");
                 caretPos += pre.length() + 1;
 

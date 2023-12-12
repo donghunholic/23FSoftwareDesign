@@ -114,11 +114,16 @@ public class Utils {
         else return 0;
     }
 
+    /**
+     * @param block block onFocus
+     * @param whichLine which line of prefix
+     * @return prefix
+     */
     public static String getPrefix(Block block, int whichLine){
         String curLine = block.getMdText().split("\n")[whichLine];
         int start = block.getIndentAtLine(whichLine);
         int end = curLine.indexOf(" ", start);
-        if (end == -1) return "";
+        if (end == -1) end = curLine.length();
         String prefix = curLine.substring(start, end);
         if(prefix.equals(">") || prefix.equals("-") || prefix.equals("+")|| prefix.equals("*")) return prefix;
         else if (prefix.endsWith(".")){
@@ -152,15 +157,16 @@ public class Utils {
 
     public static boolean isBlockStringMultiline(Block block){
         String temp = block.getText();
-        int start = block.getIndent();
+        int start = block.getIndentAtLine(0);
         int end = temp.indexOf(" ", start);
         if (end == -1) return false;
+
         String prefix = temp.substring(start, end);
         if(prefix.equals(">") || prefix.equals("-") || prefix.equals("+")|| prefix.equals("*")) return true;
         else if (prefix.endsWith(".")){
             try {
                 Integer.parseInt(prefix.substring(0, prefix.length() - 1));
-                return prefix.length() > 0;
+                return true;
             } catch (NumberFormatException e) {
                 return false;
             }

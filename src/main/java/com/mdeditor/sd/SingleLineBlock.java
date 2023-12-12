@@ -39,9 +39,8 @@ public class SingleLineBlock extends Block {
             @Override
             public void keyReleased(KeyEvent e) {
                 if(e.getKeyCode() == KeyEvent.VK_ENTER){
-                    if(Utils.isBlockStringMultiline(getThis())){
+                    if(Utils.isBlockStringMultiline(getBlock())){
                         requestManager(BlockEvent.TRANSFORM_MULTI, getCaretPosition());
-                        return;
                     }
                     else{
                         requestManager(BlockEvent.NEW_BLOCK, 0);
