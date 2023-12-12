@@ -23,8 +23,16 @@ public class BlockManager {
     }
 
     /**
-     * Handle Focus event
-     * Block is created or deleted, request update to MarkdownEditor
+     * Handle blockEvent
+     * At each event case,
+     * 1) Change blockOnFocus and call ManageBlock
+     * 2) blockList Management
+     * 3) Handle Caret Position
+     *
+     * @param block block which called requestManager
+     *              (Basically onFocus block, except OUTFOCUS_CLICKED -> clicked block)
+     * @param e Type of BlockEvent
+     * @param pos Primitive caret position
      */
     public void update(Block block, BlockEvent e, int pos) {
         int idx = blockList.indexOf(block);
@@ -36,11 +44,13 @@ public class BlockManager {
             case UPDATE_BLOCK -> { return; }
 
             case NEW_BLOCK -> {
-                String str = block.getMdText().substring(block.getCaretPosition());
-                block.setMdText(block.getMdText().substring(0,block.getCaretPosition()));
-                block.renderHTML();
                 SingleLineBlock newBlock = new SingleLineBlock(this);
-                newBlock.setMdText(str);
+
+                String mdText = block.getMdText();
+                int caretPosition = Math.min(block.getCaretPosition(), mdText.length());
+
+                block.setMdText(mdText.substring(0, caretPosition));
+                newBlock.setMdText(mdText.substring(caretPosition));
                 blockList.add(idx+1, newBlock);
                 this.blockOnFocus = newBlock;
             }
@@ -48,19 +58,18 @@ public class BlockManager {
                 if(idx > 0){
                     Block newFocusBlock = blockList.get(idx-1);
                     caretPos = newFocusBlock.getMdText().length();
-                    newFocusBlock.setMdText(newFocusBlock.getMdText() + block.getMdText());
+                    newFocusBlock.setMdText(newFocusBlock.getMdText() + blockOnFocus.getMdText());
+                    this.blockOnFocus = newFocusBlock;
+
                     blockList.remove(block);
                     block.destruct();
-                    this.blockOnFocus = newFocusBlock;
                 }
             }
             case OUTFOCUS_BLOCK_UP -> {
                 if(idx > 0){
                     this.blockOnFocus = blockList.get(idx-1);
                     manageBlock(idx);
-                    blockList.get(idx).renderHTML();
                     caretPos = Math.max(0, blockOnFocus.getMdText().lastIndexOf('\n')) + pos;
-                    //TODO: calc proper caret position
                 }
                 else return;
             }
@@ -68,8 +77,9 @@ public class BlockManager {
                 if(idx < blockList.size()-1){
                     this.blockOnFocus = blockList.get(idx+1);
                     manageBlock(idx);
-                    blockList.get(idx).renderHTML();
-                    //TODO: calc proper caret position
+                    int nextLineLength = blockOnFocus.getMdText().indexOf('\n') == -1 ?
+                            blockOnFocus.getMdText().length() : blockOnFocus.getMdText().indexOf('\n');
+                    caretPos = Math.min(nextLineLength, pos);
                 }
                 else return;
             }
@@ -77,16 +87,17 @@ public class BlockManager {
                 if(blockOnFocus != blockList.get(idx)){
                     Block tmpFocus = blockList.get(idx);
                     manageBlock(blockList.indexOf(blockOnFocus));
-                    blockOnFocus.renderHTML();
                     blockOnFocus = tmpFocus;
                     blockOnFocus.setContentType("text/html");
-                    //caretPos = blockOnFocus.getCaretPosition(pos);
+                    caretPos = block.getCaretPosition(pos);
                 }
             }
             case TRANSFORM_MULTI -> {
                 Block newBlock = new MultiLineBlock(this, "");
                 String pre = Utils.getPrefix(block, 0);
-                newBlock.setMdText(block.getMdText() + "\n" + pre + " "); // TODO: append prefix in cursor
+                newBlock.setMdText(block.getMdText() + "\n" + pre + " ");
+                caretPos += pre.length() + 1;
+
                 blockList.add(idx, newBlock);
                 blockList.remove(block);
                 block.destruct();
@@ -200,11 +211,17 @@ public class BlockManager {
                 temp.setMdText(str.substring(nl_idx+1));
             }
         }
-        if(!is_last_line && idx + 1 < blockList.size()){
+
+        //TODO: Stack Overflow happens when there is indentation inside multilineblock
+        if(!is_last_line && (idx < blockList.size() - 1)){
             BlockParse(idx+1);
         }
     }
 
+    /**
+     * Initial blockList setup when opening WYSIWYG editor
+     * @param markdownString All text from original file
+     */
     public void setBlocks(String markdownString){
         blockList.clear();
         blockList = parseStringIntoBlocks(markdownString);
@@ -228,8 +245,13 @@ public class BlockManager {
 
     }
 
+    /**
+     * For every block in blockList, call renderHTML if block is not focused,
+     * blockOnFocus calls (overridden) requestFocusInWindow
+     * 'pos' must not be illegal, because this is the final caret position
+     * @param caretPos caret position under pretreatment
+     */
     public void renderAll(int caretPos){
-        String ContentType=blockOnFocus.getContentType();
         for(Block block : blockList){
             if(block != blockOnFocus && !block.getContentType().equals("text/html")){
                 block.renderHTML();
@@ -242,14 +264,7 @@ public class BlockManager {
                 blockOnFocus.getMdText().length() : Math.max(0, caretPos);
         SwingUtilities.invokeLater(()->{
             blockOnFocus.requestFocusInWindow();
-            if(ContentType.equals("text/html"))
-            {
-                blockOnFocus.setCaretPosition(pos);
-            }
-            else
-            {
-                blockOnFocus.setCaretPosition(pos);
-            }
+            blockOnFocus.setCaretPosition(pos);
         });
     }
 
@@ -295,6 +310,10 @@ public class BlockManager {
         return blocks;
     }
 
+    /**
+     * Merges block if block has the same type with surrounding blocks after text update
+     * @param idx block number which we inspect now
+     */
     public void mergeBlock(int idx){
         int cur_idx = idx;
         Block cur, up, down;
@@ -302,15 +321,16 @@ public class BlockManager {
             cur = blockList.get(cur_idx);
             up = blockList.get(cur_idx - 1);
             if(cur instanceof MultiLineBlock && up instanceof MultiLineBlock){
-                if(Objects.equals(((MultiLineBlock) cur).prefix, ((MultiLineBlock) up).prefix) || (Utils.isOL(((MultiLineBlock) cur).prefix)) && Utils.isOL(((MultiLineBlock) up).prefix)){
+                String curPre = Utils.getPrefix(cur, 0);
+                String upPre = Utils.getPrefix(up, 0);
+                if(curPre.equals(upPre) || (Utils.isOL(curPre) && Utils.isOL(upPre))){
                     up.setMdText(up.getMdText() + "\n" + cur.getMdText());
                     if(blockOnFocus == cur){
                         blockOnFocus = blockList.get(cur_idx + 1);
-                        SwingUtilities.invokeLater(()->{
-                            blockOnFocus.requestFocusInWindow();
-                        });
+                        blockOnFocus.renderMD();
                     }
                     blockList.remove(cur);
+                    cur.destruct();
                     cur_idx--;
                     mergeBlock(cur_idx);
                 }
@@ -320,15 +340,16 @@ public class BlockManager {
             cur = blockList.get(cur_idx);
             down = blockList.get(cur_idx + 1);
             if(cur instanceof MultiLineBlock && down instanceof MultiLineBlock){
-                if(Objects.equals(((MultiLineBlock) cur).prefix, ((MultiLineBlock) down).prefix) || (Utils.isOL(((MultiLineBlock) cur).prefix)) && Utils.isOL(((MultiLineBlock) down).prefix)){
+                String curPre = Utils.getPrefix(cur, 0);
+                String downPre = Utils.getPrefix(down, 0);
+                if(curPre.equals(downPre) || (Utils.isOL(curPre) && Utils.isOL(downPre))){
                     cur.setMdText(cur.getMdText() + "\n" + down.getMdText());
                     if(blockOnFocus == down){
                         blockOnFocus = cur;
-                        SwingUtilities.invokeLater(()->{
-                            blockOnFocus.requestFocusInWindow();
-                        });
+                        blockOnFocus.renderMD();
                     }
                     blockList.remove(down);
+                    down.destruct();
                     mergeBlock(cur_idx);
                 }
             }
@@ -337,6 +358,10 @@ public class BlockManager {
         blockList.get(cur_idx).renderHTML();
     }
 
+    /**
+     * call blockParse and mergeBlock
+     * @param idx block index which will be focused out
+     */
     public void manageBlock(int idx){
         BlockParse(idx);
         mergeBlock(idx);
