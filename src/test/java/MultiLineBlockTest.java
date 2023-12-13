@@ -16,13 +16,14 @@ public class MultiLineBlockTest {
     BlockManager manager = mock(BlockManager.class);
     KeyListener[] listeners;
     KeyListener l;
-    KeyEvent eE, eB, eU, eD, eL, eR;
+    KeyEvent eT, eE, eB, eU, eD, eL, eR;
 
     @BeforeEach
     void clearBlock() {
         block = new MultiLineBlock(manager, "");
         listeners = block.getKeyListeners();
         l = listeners[listeners.length - 1];
+        eT = new KeyEvent(block, KeyEvent.KEY_RELEASED, System.currentTimeMillis(), 0, KeyEvent.VK_TAB, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_STANDARD);
         eE = new KeyEvent(block, KeyEvent.KEY_RELEASED, System.currentTimeMillis(), 0, KeyEvent.VK_ENTER, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_STANDARD);
         eB = new KeyEvent(block, KeyEvent.KEY_RELEASED, System.currentTimeMillis(), 0, KeyEvent.VK_BACK_SPACE, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_STANDARD);
         eU = new KeyEvent(block, KeyEvent.KEY_RELEASED, System.currentTimeMillis(), 0, KeyEvent.VK_UP, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_STANDARD);
@@ -105,6 +106,20 @@ public class MultiLineBlockTest {
     }
 
     @Test
+    void testKeyEventHandlerKeyReleasedValidCaret() {
+        block.setMdText("""
+                > quote 1
+                > quote 2
+                > quote 3
+                """);
+        block.renderMD();
+        block.setCaretPosition(3);
+        assertDoesNotThrow(() -> {
+            l.keyReleased(eE);
+        });
+    }
+
+    @Test
     void testKeyEventHandlerKeyCombined() {
         block.setCaretPosition(0);
         assertDoesNotThrow(() -> {
@@ -112,6 +127,20 @@ public class MultiLineBlockTest {
             l.keyPressed(eB);
             l.keyReleased(eB);
             verify(manager).update(block, BlockEvent.DELETE_BLOCK, -1);
+        });
+    }
+
+    @Test
+    void testKeyEventHandlerTab() {
+        block.setMdText("""
+                > quote 1
+                > quote 2
+                > quote 3
+                """);
+        block.renderMD();
+        block.setCaretPosition(12);
+        assertDoesNotThrow(() -> {
+            l.keyReleased(eT);
         });
     }
 }
