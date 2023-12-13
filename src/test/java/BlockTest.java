@@ -97,12 +97,6 @@ public class BlockTest {
     }
 
     @Test
-    void testIndent() {
-        block.setIndent_level(10);
-        assertEquals(block.getIndent_level(), 10);
-    }
-
-    @Test
     void testMouseEventHandler() {
         assertDoesNotThrow(() -> {
             SwingUtilities.invokeAndWait(() -> block.dispatchEvent(new MouseEvent(block, MouseEvent.MOUSE_CLICKED, System.currentTimeMillis(), 0, 0, 0, 0, true, MouseEvent.BUTTON1)));

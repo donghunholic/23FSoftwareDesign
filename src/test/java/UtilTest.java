@@ -155,14 +155,12 @@ void function(){
     })
     void testPrefixCheck(String mdText, int indent, int result) {
         block.setMdText("  ".repeat(indent) + mdText);
-        block.setIndent_level(indent);
         assertEquals(result, Utils.prefix_check(block));
     }
 
     @Test
     void testPrefixCheckException() {
         block.setMdText("  " + "a. alphabet");
-        block.setIndent_level(1);
         assertEquals(0, Utils.prefix_check(block));
     }
 
