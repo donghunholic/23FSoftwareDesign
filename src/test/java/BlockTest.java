@@ -109,7 +109,7 @@ public class BlockTest {
     }
 
     @Test
-    void testgetCaretPosition() {
+    void testGetCaretPosition() {
         block.setMdText("- how\n- how\n  - ab cd A\n  - ab cd B");
         assertEquals(19,block.getCaretPosition(12));
         assertEquals(23,block.getCaretPosition(16));
