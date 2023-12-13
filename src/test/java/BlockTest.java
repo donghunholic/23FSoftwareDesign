@@ -1,14 +1,12 @@
-import com.mdeditor.sd.Block;
-import com.mdeditor.sd.BlockEvent;
-import com.mdeditor.sd.BlockManager;
-import com.mdeditor.sd.Utils;
+import com.mdeditor.sd.block.Block;
+import com.mdeditor.sd.manager.BlockManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class BlockTest {
+class BlockTest {
     @Mock
     BlockManager manager;
     Block block;

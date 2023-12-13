@@ -1,8 +1,10 @@
-package com.mdeditor.sd;
+package com.mdeditor.sd.block;
+
+import com.mdeditor.sd.manager.BlockManager;
+import com.mdeditor.sd.utils.Utils;
+import com.mdeditor.sd.manager.BlockEvent;
 
 import javax.swing.*;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -13,16 +15,15 @@ import java.awt.event.MouseListener;
  * When the block grabs focus, renderMD()
  */
 public class Block extends JTextPane {
-
     private String mdText;
     private BlockManager blockManager;
-    protected int CaretPosition;
+    protected int caretPosition;
 
     public Block(BlockManager manager){
         this.mdText = "";
         this.setEditable(true);
         this.blockManager = manager;
-        this.CaretPosition=0;
+        this.caretPosition=0;
         this.setFont(new Font("Jetbrains Mono", Font.PLAIN, 15));
 
         this.addMouseListener(new MouseListener() {
@@ -32,29 +33,32 @@ public class Block extends JTextPane {
             }
 
             @Override
-            public void mousePressed(MouseEvent e) { }
+            public void mousePressed(MouseEvent e) {
+                // nothing to do here, so left it empty
+            }
 
             @Override
-            public void mouseReleased(MouseEvent e) {  }
+            public void mouseReleased(MouseEvent e) {
+                // nothing to do here, so left it empty
+            }
 
             @Override
-            public void mouseEntered(MouseEvent e) {  }
+            public void mouseEntered(MouseEvent e) {
+                // nothing to do here, so left it empty
+            }
 
             @Override
-            public void mouseExited(MouseEvent e) {  }
+            public void mouseExited(MouseEvent e) {
+                // nothing to do here, so left it empty
+            }
         });
 
-        this.addCaretListener(new CaretListener() {
-            @Override
-            public void caretUpdate(CaretEvent e) {
-                if(e.getDot()==0&&CaretPosition==-1)
-                {
-                    CaretPosition=-1;
-                }
-                else
-                {
-                    CaretPosition=e.getDot();
-                }
+        this.addCaretListener(e -> {
+            if(e.getDot()==0 && caretPosition==-1) {
+                caretPosition=-1;
+            }
+            else {
+                caretPosition=e.getDot();
             }
         });
     }
@@ -136,24 +140,21 @@ public class Block extends JTextPane {
         }
 
 
-        char prefix=GetPrefix();
+        char prefix = getPrefix();
 
         switch (prefix) {
             case '#':
-                return MarkdownHeaderPosition(position);
+                return markdownHeaderPosition(position);
             case '>':
-                return MarkdownQuotePosition(position);
-            case '-':
-            case '*':
-            case '+':
-            case '.':
-                return MarkdownListPosition(position,prefix);
+                return markdownQuotePosition(position);
+            case '-', '*', '+', '.':
+                return markdownListPosition(position,prefix);
             default:
                 return position;
         }
     }
 
-    private char GetPrefix(){
+    private char getPrefix(){
         int prefixPos=0;
         while(mdText.charAt(prefixPos)==' ')
         {
@@ -168,7 +169,7 @@ public class Block extends JTextPane {
         return prefix;
     }
 
-    private int MarkdownHeaderPosition(int position) {
+    private int markdownHeaderPosition(int position) {
         int prefixLength = getPrefixLength('#');
         if (prefixLength == -1) {
             return position;
@@ -178,7 +179,7 @@ public class Block extends JTextPane {
         return (position - 1) + prefixLength;
     }
 
-    private int MarkdownQuotePosition(int position) {
+    private int markdownQuotePosition(int position) {
         int prefixLength = getPrefixLength('>');
         if (prefixLength == -1) {
             return position;
@@ -201,30 +202,26 @@ public class Block extends JTextPane {
         return -1;
     }
 
-    private int MarkdownListPosition(int position, char targetChar) {
+    private int markdownListPosition(int position, char targetChar) {
         int htmlPos=0;
         int startpos=mdText.indexOf(targetChar);
-        while(htmlPos<=position)
-        {
+        while(htmlPos<=position) {
             startpos++;
-            if(mdText.charAt(startpos)==' ')
-            {
+            if(mdText.charAt(startpos)==' ') {
                 continue;
             }
             int endpos=mdText.indexOf('\n', startpos);
-            if(endpos==-1)
-            {
+            if(endpos==-1) {
                 endpos=mdText.length();
             }
 
             htmlPos++;
-            if(htmlPos==position)
-            {
+            if(htmlPos==position) {
                 return startpos;
             }
             int curPos=startpos;
-            for(int i=0;i<endpos-startpos;i++)
-            {
+
+            for(int i=0;i<endpos-startpos;i++) {
                 htmlPos++;
                 curPos++;
                 if(htmlPos==position)
@@ -232,9 +229,9 @@ public class Block extends JTextPane {
                     return curPos;
                 }
             }
+
             startpos=mdText.indexOf(targetChar, startpos + 1);
-            if(startpos==-1)
-            {
+            if(startpos==-1) {
                 break;
             }
         }

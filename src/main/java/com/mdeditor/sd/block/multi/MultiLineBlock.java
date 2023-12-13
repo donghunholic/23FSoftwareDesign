@@ -1,4 +1,9 @@
-package com.mdeditor.sd;
+package com.mdeditor.sd.block.multi;
+
+import com.mdeditor.sd.block.Block;
+import com.mdeditor.sd.manager.BlockManager;
+import com.mdeditor.sd.utils.Utils;
+import com.mdeditor.sd.manager.BlockEvent;
 
 import javax.swing.text.Element;
 import java.awt.event.KeyEvent;
@@ -16,11 +21,8 @@ public class MultiLineBlock extends Block {
      * code block:
      * When 'enter' key input event, automatically add prefix to the new line
      */
-    public String prefix;
-
     public MultiLineBlock(BlockManager manager, String pre){
         super(manager);
-        prefix = pre;
         this.addKeyListener(new KeyListener() {
             /*
             All of our key listen logic is contained within keyReleased().
@@ -35,7 +37,7 @@ public class MultiLineBlock extends Block {
 
             @Override
             public void keyTyped(KeyEvent e) {
-
+                // nothing to do here, so left it empty
             }
 
             @Override
@@ -43,16 +45,16 @@ public class MultiLineBlock extends Block {
                 if(getCaretPosition()==1)
                 {
                     if(e.getKeyCode() == KeyEvent.VK_LEFT){
-                        CaretPosition=-1;
+                        caretPosition=-1;
                     }
                 }
-                else if(CaretPosition==-1)
+                else if(caretPosition==-1)
                 {
-                    CaretPosition=-1;
+                    caretPosition=-1;
                 }
                 else
                 {
-                    CaretPosition=getCaretPosition();
+                    caretPosition=getCaretPosition();
                 }
 
                 if(e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_TAB){
@@ -102,11 +104,11 @@ public class MultiLineBlock extends Block {
                 }
 
                 else if(e.getKeyCode() == KeyEvent.VK_BACK_SPACE){
-                    if(CaretPosition==0)
+                    if(caretPosition==0)
                     {
-                        CaretPosition=-1;
+                        caretPosition=-1;
                     }
-                    else if(CaretPosition==-1)
+                    else if(caretPosition==-1)
                     {
                         requestManager(BlockEvent.DELETE_BLOCK, -1);
                     }

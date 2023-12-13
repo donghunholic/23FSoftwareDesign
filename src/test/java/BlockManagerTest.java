@@ -1,5 +1,5 @@
-import com.mdeditor.sd.Block;
-import com.mdeditor.sd.BlockManager;
+import com.mdeditor.sd.block.Block;
+import com.mdeditor.sd.manager.BlockManager;
 import com.mdeditor.sd.editor.MarkdownEditor;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
@@ -9,7 +9,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class BlockManagerTest {
+class BlockManagerTest {
     @Mock
     MarkdownEditor markdownEditor;
     BlockManager blockManager = new BlockManager(markdownEditor);

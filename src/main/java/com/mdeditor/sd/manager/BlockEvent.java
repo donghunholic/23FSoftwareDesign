@@ -1,4 +1,4 @@
-package com.mdeditor.sd;
+package com.mdeditor.sd.manager;
 
 public enum BlockEvent {
     NEW_BLOCK, DELETE_BLOCK, OUTFOCUS_BLOCK_UP, OUTFOCUS_BLOCK_DOWN, OUTFOCUS_CLICKED,

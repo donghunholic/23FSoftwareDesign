@@ -1,5 +1,10 @@
-package com.mdeditor.sd;
+package com.mdeditor.sd.manager;
 
+import com.mdeditor.sd.utils.Utils;
+import com.mdeditor.sd.block.Block;
+import com.mdeditor.sd.block.multi.MultiLine;
+import com.mdeditor.sd.block.multi.MultiLineBlock;
+import com.mdeditor.sd.block.single.SingleLineBlock;
 import com.mdeditor.sd.editor.MarkdownEditor;
 import com.vladsch.flexmark.util.ast.Node;
 import org.apache.commons.lang3.tuple.Pair;
@@ -7,7 +12,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import javax.swing.*;
 import java.util.*;
-
 
 public class BlockManager {
     private List<Block> blockList;
@@ -319,30 +323,32 @@ public class BlockManager {
      * @param idx block number which we inspect now
      */
     public void mergeBlock(int idx){
-        int cur_idx = idx;
-        Block cur, up, down;
+        int curIdx = idx;
+        Block cur;
+        Block up;
+        Block down;
         if(idx > 0){
-            cur = blockList.get(cur_idx);
-            up = blockList.get(cur_idx - 1);
+            cur = blockList.get(curIdx);
+            up = blockList.get(curIdx - 1);
             if(cur instanceof MultiLineBlock && up instanceof MultiLineBlock){
                 String curPre = Utils.getPrefix(cur, 0);
                 String upPre = Utils.getPrefix(up, 0);
                 if(curPre.equals(upPre) || (Utils.isOL(curPre) && Utils.isOL(upPre))){
                     up.setMdText(up.getMdText() + "\n" + cur.getMdText());
                     if(blockOnFocus == cur){
-                        blockOnFocus = blockList.get(cur_idx + 1);
+                        blockOnFocus = blockList.get(curIdx + 1);
                         blockOnFocus.renderMD();
                     }
                     blockList.remove(cur);
                     cur.destruct();
-                    cur_idx--;
-                    mergeBlock(cur_idx);
+                    curIdx--;
+                    mergeBlock(curIdx);
                 }
             }
         }
         if(idx < blockList.size() - 1){
-            cur = blockList.get(cur_idx);
-            down = blockList.get(cur_idx + 1);
+            cur = blockList.get(curIdx);
+            down = blockList.get(curIdx + 1);
             if(cur instanceof MultiLineBlock && down instanceof MultiLineBlock){
                 String curPre = Utils.getPrefix(cur, 0);
                 String downPre = Utils.getPrefix(down, 0);
@@ -354,12 +360,12 @@ public class BlockManager {
                     }
                     blockList.remove(down);
                     down.destruct();
-                    mergeBlock(cur_idx);
+                    mergeBlock(curIdx);
                 }
             }
         }
-        blockList.get(cur_idx).renderMD();
-        blockList.get(cur_idx).renderHTML();
+        blockList.get(curIdx).renderMD();
+        blockList.get(curIdx).renderHTML();
     }
 
     /**
