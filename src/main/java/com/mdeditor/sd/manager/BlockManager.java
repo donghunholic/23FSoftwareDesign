@@ -276,7 +276,11 @@ public class BlockManager {
         });
     }
 
-    /**/
+    /**
+     * @param markdownString Markdown string that wants to know the start/end index of the table
+     * @return start index and end index of table from input string as a pair.
+     * If there is no table, then return {-1, -1}.
+     */
     public Pair<Integer, Integer> getTableIndexFromMarkdownString(String markdownString){
         List<Block> blocks = parseStringIntoBlocks(markdownString);
         for(Block block : blocks){
@@ -291,7 +295,7 @@ public class BlockManager {
 
 
     /**
-     * @param markdownString : markdown string to parse into blocks.
+     * @param markdownString markdown string to parse into blocks.
      * @return list of Block, which contains only mdText.
      */
     public List<Block> parseStringIntoBlocks(String markdownString){

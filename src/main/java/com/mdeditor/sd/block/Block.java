@@ -11,14 +11,18 @@ import java.awt.event.MouseListener;
 
 /**
  * Block contains mdText.
- * When the block is out of focus, renderHTML()
- * When the block grabs focus, renderMD()
+ * When the block is out of focus, call renderHTML()
+ * When the block grabs focus, call renderMD()
  */
 public class Block extends JTextPane {
-    private String mdText;
+    private String mdText; // Markdown text in block
     private BlockManager blockManager;
-    protected int caretPosition;
+    protected int caretPosition; // cursor position
 
+    /**
+     * Must append specific key or mouse listener in this constructor.
+     * @param manager : manager to call from key or mouse listener
+     */
     public Block(BlockManager manager){
         this.mdText = "";
         this.setEditable(true);
@@ -64,15 +68,14 @@ public class Block extends JTextPane {
     }
 
     /**
-     * Get block mdText
-     * @return mdText
+     * @return mdText in this block.
      */
     public String getMdText(){
         return this.mdText;
     }
 
     /**
-     * Set mdText to newText.
+     * Set new mdText.
      * Called inside renderHTML()
      */
     public void setMdText(String newText){
@@ -80,8 +83,7 @@ public class Block extends JTextPane {
     }
 
     /**
-     * convert mdText to HTML
-     * using Utils.stringToHtml()
+     * Set block's text to rendered Markdown text using Utils.stringToHtml()
      */
     public void renderHTML(){
         this.setContentType("text/html");
@@ -89,7 +91,7 @@ public class Block extends JTextPane {
     }
 
     /**
-     * Set block's jTextPane to mdText
+     * Set block's text to mdText.
      */
     public void renderMD(){
         if(!this.getContentType().equals("text/plain") || this.getText().isEmpty()){
@@ -98,22 +100,33 @@ public class Block extends JTextPane {
         }
     }
 
+    /**
+     * @return this instance
+     */
     public Block getBlock(){
         return this;
     }
 
+    /**
+     * @return manager set in this block
+     */
     public BlockManager getManager(){
         return blockManager;
     }
 
     /**
      * Requests blockManager to handle BlockEvents by keyListener
-     * @param e - See BlockEvent.java
+     * @param e
+     * @see BlockEvent
      */
     public void requestManager(BlockEvent e, int pos){
         blockManager.update(this, e, pos);
     }
 
+    /**
+     * Call this method when block grabs a focus.
+     * Internally, call renderMD() function and set focus to this block.
+     */
     @Override
     public boolean requestFocusInWindow(){
         renderMD();
@@ -131,14 +144,13 @@ public class Block extends JTextPane {
 
     /**
      * Function to correct caret difference before and after block's content type change
-     * @param position - primitive caret position (in HTML format)
+     * @param position primitive caret position (in HTML format)
      * @return caret position in MD format
      */
     public int getCaretPosition(int position){
         if (mdText == null || mdText.isEmpty() || position < 0 || position > mdText.length()) {
             return 0;
         }
-
 
         char prefix = getPrefix();
 
@@ -154,21 +166,26 @@ public class Block extends JTextPane {
         }
     }
 
+    /**
+     * @return the prefix of the block.
+     */
     private char getPrefix(){
         int prefixPos=0;
-        while(mdText.charAt(prefixPos)==' ')
-        {
+        while(mdText.charAt(prefixPos)==' ') {
             prefixPos++;
         }
         char prefix = mdText.charAt(prefixPos);
-        if (Character.isDigit(prefix))
-        {
+        if (Character.isDigit(prefix)) {
             prefix='.';
         }
 
         return prefix;
     }
 
+    /**
+     * When block is # header, calculate its prefix.
+     * @return prefix position of header
+     */
     private int markdownHeaderPosition(int position) {
         int prefixLength = getPrefixLength('#');
         if (prefixLength == -1) {
@@ -179,6 +196,10 @@ public class Block extends JTextPane {
         return (position - 1) + prefixLength;
     }
 
+    /**
+     * When block is > quote, calculate its prefix.
+     * @return prefix position of quote
+     */
     private int markdownQuotePosition(int position) {
         int prefixLength = getPrefixLength('>');
         if (prefixLength == -1) {
@@ -188,6 +209,9 @@ public class Block extends JTextPane {
         return (position - 1) + prefixLength;
     }
 
+    /**
+     * @return prefix length of input char.
+     */
     private int getPrefixLength(char prefix) {
         int length = 0;
         for (int i = 0; i < mdText.length(); i++) {
@@ -202,6 +226,10 @@ public class Block extends JTextPane {
         return -1;
     }
 
+    /**
+     * When block is - list, calculate its prefix.
+     * @return prefix position of list
+     */
     private int markdownListPosition(int position, char targetChar) {
         int htmlPos=0;
         int startpos=mdText.indexOf(targetChar);
@@ -239,7 +267,7 @@ public class Block extends JTextPane {
     }
 
     /**
-     * @return Number of spaces(indent) where the cursor is
+     * @return number of spaces(indent) of line where the cursor is located.
      */
     public int getIndent() {
         String[] lines = getMdText().split("\n");
@@ -247,8 +275,8 @@ public class Block extends JTextPane {
     }
 
     /**
-     * Returns the number of space at lineNum
-     * @param lineNum - Line which you want to check indent
+     * Returns the number of space at lineNum.
+     * @param lineNum Line which you want to check indent
      * @return number of space
      */
     public int getIndentAtLine(int lineNum){
@@ -257,6 +285,9 @@ public class Block extends JTextPane {
         return countSpace(lines[lineNum]);
     }
 
+    /**
+     * @return the line index of line where the cursor is located.
+     */
     public int getWhichLine(String[] lines) {
         int caret = getCaretPosition();
         int totalChars = 0;
@@ -269,6 +300,9 @@ public class Block extends JTextPane {
         return lines.length - 1;
     }
 
+    /**
+     * @return count of space of input line.
+     */
     private int countSpace(String line) {
         int cnt = 0;
         for (char c : line.toCharArray()) {

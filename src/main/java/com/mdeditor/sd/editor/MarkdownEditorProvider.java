@@ -13,7 +13,7 @@ public class MarkdownEditorProvider implements FileEditorProvider {
     /**
      * The method is expected to run fast.
      *
-     * @param project
+     * @param project projects this editor will be responsible for
      * @param file    file to be tested for acceptance.
      * @return {@code true} if provider can create valid editor for the specified {@code file}.
      */
@@ -29,8 +29,6 @@ public class MarkdownEditorProvider implements FileEditorProvider {
      * {@code true}).
      * The provider should return only valid editor.
      *
-     * @param project
-     * @param file
      * @return created editor for specified file.
      */
     @Override

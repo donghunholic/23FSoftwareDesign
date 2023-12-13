@@ -11,9 +11,10 @@ import java.awt.event.KeyListener;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
+/**
+ * @see MultiLine
+ */
 public class MultiLineBlock extends Block {
-    MultiLine type;
-
     /**
      * quote: >
      * checkbox: []
@@ -21,8 +22,17 @@ public class MultiLineBlock extends Block {
      * code block:
      * When 'enter' key input event, automatically add prefix to the new line
      */
+    MultiLine type;
+
+    public String prefix;
+
+    /**
+     * Must append specific keyboard or mouse listener in this constructor.
+     * @param manager : manager to call from key or mouse listener
+     */
     public MultiLineBlock(BlockManager manager, String pre){
         super(manager);
+        prefix = pre;
         this.addKeyListener(new KeyListener() {
             /*
             All of our key listen logic is contained within keyReleased().
@@ -147,6 +157,10 @@ public class MultiLineBlock extends Block {
         });
     }
 
+    /**
+     * Generates a new formatted line for Markdown text.
+     * @return the prefix of the line where the cursor is located.
+     */
     private String getNewLine(){
         String[] lines = getMdText().split("\n");
         int indent = getIndent();
@@ -162,14 +176,27 @@ public class MultiLineBlock extends Block {
         return ret;
     }
 
+    /**
+     * Set type of this MultiLineBlock.
+     * @see MultiLine
+     */
     public void setType(MultiLine type) {
         this.type = type;
     }
 
+    /**
+     * Get type of this MultiLineBlock
+     * @see MultiLine
+     */
     public MultiLine getType() {
         return type;
     }
 
+    /**
+     * Determines whether the cursor is positioned on the first line.
+     * @param caretPosition : cursor position in JTextPane
+     * @return true if cursor is in first line, otherwise false.
+     */
     private boolean isCaretInFirstLine(int caretPosition){
         Element root = this.getDocument().getDefaultRootElement();
         int line = root.getElementIndex(caretPosition);
@@ -177,6 +204,11 @@ public class MultiLineBlock extends Block {
         return line == 0;
     }
 
+    /**
+     * Determines whether the cursor is positioned on the last line.
+     * @param caretPosition : cursor position in JTextPane
+     * @return true if cursor is in last line, otherwise false.
+     */
     public boolean isCaretInLastLine(int caretPosition) {
         Element root = this.getDocument().getDefaultRootElement();
         int line = root.getElementIndex(caretPosition);

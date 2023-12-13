@@ -37,6 +37,9 @@ public class Utils {
         flexHtmlRenderer = HtmlRenderer.builder(flexmarkOptions).build();
     }
 
+    /**
+     * Read CSS file from resource folder and save to static variable.
+     */
     public static String readCss(){
         InputStream cssStream = Utils.class.getClassLoader().getResourceAsStream("editor/github-markdown-light.css");
         if(cssStream == null) return "";
@@ -49,13 +52,19 @@ public class Utils {
         }
     }
 
+    /**
+     * Wrap content with input tag.
+     * @param tag HTML tag you want to wrap
+     * @param content what you want to cover
+     * @return wrapped content with input tag as HTML format.
+     */
     public static String wrapWithHtmlTag(String tag, String content){
         return "<" + tag + ">" + content + "</" + tag + ">";
     }
 
     /**
-     * returns the html-rendered text
-     * @param str - which is stored in Block, Markdown Text.
+     * Returns the html-rendered text
+     * @param str which is stored in Block, Markdown Text.
      * @return String that has string of html Rendered text.
      */
     public static String stringToHtml(String str){
@@ -63,16 +72,27 @@ public class Utils {
         return flexHtmlRenderer.render(parseResult);
     }
 
+    /**
+     * Returns the html-rendered and css-applied html format text.
+     * @param string which is stored in Block, Markdown Text.
+     * @return String that has string of html and CSS Rendered text.
+     */
     public static String stringToHtmlWithCss(String string){
         Document doc = Jsoup.parse(stringToHtml(string));
         doc.head().html(style);
         return doc.outerHtml();
     }
 
+    /**
+     * Parses the input Markdown text and generates a Flexmark AST (Abstract Syntax Tree) node.
+     */
     public static Node flexmarkParse(String input){
         return flexmarkParser.parse(input);
     }
 
+    /**
+     * Renders the HTML representation of a Flexmark AST (Abstract Syntax Tree) node.
+     */
     public static String flexmarkHtmlRender(Node node){
         return flexHtmlRenderer.render(node);
     }
@@ -100,6 +120,10 @@ public class Utils {
         else return "";
     }
 
+    /**
+     * Determine if input pre is ordered list or not.
+     * @return true if input is ordered list, false otherwise.
+     */
     public static boolean isOL(String pre){
         if(pre.endsWith(".")){
             return pre.substring(0, pre.indexOf(".")).matches("\\d+");
@@ -108,6 +132,10 @@ public class Utils {
         return false;
     }
 
+    /**
+     * Determine if input block is multiline block or not.
+     * @return true if input block's content can be multiline block, false otherwise.
+     */
     public static boolean isBlockStringMultiline(Block block){
         String temp = block.getText();
         int start = block.getIndentAtLine(0);

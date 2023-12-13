@@ -8,6 +8,10 @@ import com.mdeditor.sd.manager.BlockEvent;
 import java.awt.event.*;
 
 public class SingleLineBlock extends Block {
+    /**
+     * Must append specific keyboard or mouse listener in this constructor.
+     * @param manager : manager to call from key or mouse listener
+     */
     public SingleLineBlock(BlockManager manager){
         super(manager);
 
