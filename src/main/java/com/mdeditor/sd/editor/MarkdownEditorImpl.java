@@ -37,6 +37,10 @@ public class MarkdownEditorImpl implements MarkdownEditor {
     private Box interiorPanel; // for vertical align : blocks are in here
     private JScrollPane scrollPane; // for scroll
 
+    /**
+     * @param project which project this editor belongs.
+     * @param file which file this editor deal with.
+     */
     public MarkdownEditorImpl(Project project, VirtualFile file) {
         this.file = file;
         this.project = project;
@@ -56,7 +60,9 @@ public class MarkdownEditorImpl implements MarkdownEditor {
                 .subscribe(ProjectManager.TOPIC, getProjectManagerListener());
     }
 
-    //VirtualFile Save Function
+    /**
+     * Saves changes to a virtual file within a specified project.
+     */
     public void saveVirtualFile(final Project project, final VirtualFile virtualFile) {
         WriteCommandAction.runWriteCommandAction(project, () -> {
             Document document= FileDocumentManager.getInstance().getDocument(virtualFile);
@@ -66,7 +72,9 @@ public class MarkdownEditorImpl implements MarkdownEditor {
         });
     }
 
-    //Markdown to Editor
+    /**
+     * Load text from the actual file.
+     */
     private void updateEditor()
     {
         try {
@@ -78,6 +86,11 @@ public class MarkdownEditorImpl implements MarkdownEditor {
     }
 
     //Editor to Markdown
+
+    /**
+     * Updates the content of a Markdown file
+     * by saving the extracted Markdown text from a block manager.
+     */
     private void updateMarkdownFile() {
         ApplicationManager.getApplication().runWriteAction(() ->{
             try {
@@ -90,7 +103,9 @@ public class MarkdownEditorImpl implements MarkdownEditor {
         });
     }
 
-
+    /**
+     * This function handles the action when the editor tab is switched.
+     */
     private FileEditorManagerListener getFileEditorManagerListener(){
         return new FileEditorManagerListener() {
             @Override
@@ -115,6 +130,10 @@ public class MarkdownEditorImpl implements MarkdownEditor {
         };
     }
 
+    /**
+     * Retrieves a {@link FileEditorManagerListener.Before} instance
+     * to handle events before closing a file editor.
+     */
     private FileEditorManagerListener.Before getFileEditorManagerListenerBefore(){
         return new FileEditorManagerListener.Before() {
             @Override
@@ -124,6 +143,10 @@ public class MarkdownEditorImpl implements MarkdownEditor {
         };
     }
 
+    /**
+     * Retrieves a {@link ProjectManagerListener} instance
+     * to handle events when a project is closing.
+     */
     private ProjectManagerListener getProjectManagerListener(){
         return new ProjectManagerListener() {
             @Override
@@ -133,6 +156,11 @@ public class MarkdownEditorImpl implements MarkdownEditor {
         };
     }
 
+    /**
+     * Initialize UI.
+     * There is a scrollable pane on the outside,
+     * and inside it, JTextPanes are glued vertically from the top.
+     */
     private void initUI(){
         interiorPanel = Box.createVerticalBox();
         JPanel wrapper = new JPanel(new BorderLayout());
@@ -140,17 +168,26 @@ public class MarkdownEditorImpl implements MarkdownEditor {
         scrollPane = new JBScrollPane(wrapper);
     }
 
-    // set initial UI
+    /**
+     * Append JTextPanes to interialPanel.
+     */
     private void setInitialUI(){
         for(Block elem : blockManager.getBlockList()){
             interiorPanel.add(elem);
         }
     }
 
+    /**
+     * To safely render a Swing component,
+     * you must call SwingUtilities.invokeLate within it.
+     */
     public void updateUI() {
         SwingUtilities.invokeLater(this::update);
     }
 
+    /**
+     * Get a block from blockManager and insert it into the existing UI.
+     */
     private void update(){
         interiorPanel.removeAll();
         for(JTextPane elem : blockManager.getBlockList()){
@@ -188,8 +225,6 @@ public class MarkdownEditorImpl implements MarkdownEditor {
 
     /**
      * Applies a given state to the editor.
-     *
-     * @param state
      */
     @Override
     public void setState(@NotNull FileEditorState state) {
@@ -216,8 +251,6 @@ public class MarkdownEditorImpl implements MarkdownEditor {
 
     /**
      * Adds specified listener.
-     *
-     * @param listener
      */
     @Override
     public void addPropertyChangeListener(@NotNull PropertyChangeListener listener) {
@@ -226,8 +259,6 @@ public class MarkdownEditorImpl implements MarkdownEditor {
 
     /**
      * Removes specified listener.
-     *
-     * @param listener
      */
     @Override
     public void removePropertyChangeListener(@NotNull PropertyChangeListener listener) {
@@ -243,7 +274,6 @@ public class MarkdownEditorImpl implements MarkdownEditor {
     }
 
     /**
-     * @param key
      * @return a user data value associated with this object. Doesn't require read action.
      */
     @Override
@@ -253,15 +283,15 @@ public class MarkdownEditorImpl implements MarkdownEditor {
 
     /**
      * Add a new user data value to this object. Doesn't require write action.
-     *
-     * @param key
-     * @param value
      */
     @Override
     public <T> void putUserData(@NotNull Key<T> key, @Nullable T value) {
         // nothing to do here, so left it empty
     }
 
+    /**
+     * @return the file handled by this editor.
+     */
     @Override
     public @Nullable VirtualFile getFile() {
         return file;

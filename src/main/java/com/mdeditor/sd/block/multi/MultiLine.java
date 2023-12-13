@@ -28,13 +28,19 @@ public enum MultiLine {
 
     /**
      *
-     * @param input :
-     * @return
+     * @param input : HTML tag string to determine whether it belongs to multiline
+     * @return true if input belongs to multiline, otherwise false.
      */
     public static Boolean isMultiLine(String input){
         return fromString(input) != NONE;
     }
 
+    /**
+     *
+     * @param tag : HTML tag string to determine whether it belongs to multiline
+     * @return the corresponding enum if input belongs to multiline,
+     *      *          otherwise NONE.
+     */
     public static MultiLine fromString(String tag) {
         for (MultiLine multiLine : MultiLine.values()) {
             if (multiLine.tag.equals(tag)) {
