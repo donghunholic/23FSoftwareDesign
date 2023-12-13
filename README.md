@@ -1,6 +1,6 @@
 # Intellij Markdown Editor
 
-This project is a **WYSIWYG Markdown Editor plugin** in IntelliJ IDEA.
+This project is a **Easy Markdown Editor plugin** in IntelliJ IDEA.
 
 ## Motivation
 Most developers are familiar with the Markdown language and use it to specify programs. In particular, in the case of GitHub and GitLab, Markdown is an essential language as they also provide a preview of the README.md file.
