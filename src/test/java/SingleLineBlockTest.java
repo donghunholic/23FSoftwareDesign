@@ -111,6 +111,19 @@ public class SingleLineBlockTest {
             l.keyPressed(eB);
             l.keyReleased(eB);
             verify(manager).update(block, BlockEvent.DELETE_BLOCK, -1);
+            l.keyPressed(eE);
+        });
+    }
+
+    @Test
+    void testTransformMultiScenario() {
+        String md = "- uol";
+        block.setMdText(md);
+        block.renderMD();
+        block.setCaretPosition(md.length() - 1);
+        assertDoesNotThrow(() -> {
+            l.keyReleased(eE);
+            verify(manager).update(block, BlockEvent.TRANSFORM_MULTI, block.getCaretPosition());
         });
     }
 }
