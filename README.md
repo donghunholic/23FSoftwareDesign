@@ -37,7 +37,7 @@ Because the Markdown is rendered at the same time as user modifies, they can see
   - Italic `*italic*`
   - Strikethrough `~~strikethrough~~`
   - Link `[link](link)`
-  - Image `![image](image)`
+  - Horizontal line `---`
   - Inline code ``
   - Heading `# head`
   - Quote `>`
