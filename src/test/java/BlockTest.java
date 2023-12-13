@@ -4,6 +4,8 @@ import com.mdeditor.sd.BlockManager;
 import org.jsoup.Jsoup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import javax.swing.*;
 import java.awt.event.MouseEvent;
@@ -116,5 +118,95 @@ public class BlockTest {
         assertEquals(31,block.getCaretPosition(20));
         assertEquals(34,block.getCaretPosition(23));
         assertEquals(35,block.getCaretPosition(24));
+    }
+
+    @ParameterizedTest(name = "testGerCaretPosition_{index}")
+    @CsvSource({
+            "## Head 2, 2, 4",
+            "> Quote-quote, 8, 8",
+            "- UOL - UOL, 3, 4",
+            "* UOL * UOL * UOL, 15, 16",
+            " + UOL + UOL, 10, 11",
+            "1. OL 2. OL, 5, 7",
+            "a. alphaOL, 2, 2"
+    })
+    void testGetCaretPositionParam(String md, int position, int answer) {
+        block.setMdText(md);
+        block.renderMD();
+        assertEquals(block.getCaretPosition(position), answer);
+    }
+
+    @ParameterizedTest(name = "testGerCaretPosition_{index}")
+    @CsvSource({
+            "## Head 2, 2, 2",
+            "> Quote-quote, 8, 7",
+            "- UOL - UOL, 3, 12",
+            "* UOL * UOL * UOL, 15, 22",
+            " + UOL + UOL, 10, 19",
+            "1. OL 2. OL, 5, 15",
+            "a. alphaOL, 2, 2"
+    })
+    void testGetCaretPositionParamWithSpace(String md, int position, int answer) {
+        md = "  ".repeat(md.length() % 7) + md;
+        block.setMdText(md);
+        block.renderMD();
+        assertEquals(block.getCaretPosition(position), answer);
+    }
+
+    @Test
+    void testGetCaretPositionBoundary() {
+        block.setMdText(null);
+        assertEquals(block.getCaretPosition(1), 0);
+        block.setMdText("");
+        assertEquals(block.getCaretPosition(1), 0);
+        block.setMdText("# Head 1");
+        assertEquals(block.getCaretPosition(-1), 0);
+        block.setMdText("# Head 1");
+        assertEquals(block.getCaretPosition(100), 0);
+    }
+
+    @Test
+    void testGetIndent() {
+        block.setMdText("  ".repeat(3) + "- indented uol");
+        assertEquals(block.getIndent(), 6);
+    }
+
+    @Test
+    void testGetIndentAtLine() {
+        String md = """
+       # Head with indent
+           * uol with indent
+         + something with indent
+                """;
+        block.setMdText(md);
+        assertEquals(block.getIndentAtLine(0), 0);
+        assertEquals(block.getIndentAtLine(1), 4);
+        assertEquals(block.getIndentAtLine(2), 2);
+    }
+
+    @Test
+    void testGetWhichLine() {
+        String md = """
+       # Head with indent
+           * uol with indent
+         + something with indent
+                """;
+        block.setMdText(md);
+        block.renderMD();
+        block.setCaretPosition(20);
+        assertEquals(block.getWhichLine(md.split("\n")), 1);
+    }
+
+    @Test
+    void testGetWhichLineExtreme() {
+        String md = """
+       # Head with indent
+           * uol with indent
+         + something with indent
+                """;
+        block.setMdText(md);
+        block.renderMD();
+        block.setCaretPosition(md.length());
+        assertEquals(block.getWhichLine(md.split("\n")), 2);
     }
 }
