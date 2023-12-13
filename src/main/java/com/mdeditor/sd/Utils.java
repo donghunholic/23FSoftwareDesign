@@ -137,7 +137,7 @@ public class Utils {
         else return "";
     }
 
-    public boolean table_check(Block block){
+    public static boolean table_check(Block block){
         String temp = block.getMdText();
         if (temp.startsWith("|") && temp.endsWith("|")) {}
         return true;
