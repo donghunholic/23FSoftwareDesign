@@ -36,6 +36,7 @@ public class SingleLineBlock extends Block {
             @Override
             public void keyReleased(KeyEvent e) {
                 if(e.getKeyCode() == KeyEvent.VK_ENTER){
+                    if (Utils.string_table_check(getBlock().getMdText()) != 0) Utils.tableManage(getBlock());
                     requestManager(BlockEvent.NEW_BLOCK, 0);
                 }
 

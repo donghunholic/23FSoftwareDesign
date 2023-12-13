@@ -110,6 +110,24 @@ public class Utils {
         return 0;
     }
 
+    public static void tableManage(Block block){
+        int block_index = block.getManager().getBlockList().indexOf(block);
+        int column = string_table_check(block.getMdText());
+        if (block instanceof SingleLineBlock) {
+            if (block_index > 0) {
+                Block previous_block = block.getManager().getBlockList().get(block_index - 1);
+                if(previous_block instanceof SingleLineBlock) {
+                    if (string_table_check(previous_block.getMdText()) == -column) {
+                        previous_block.setMdText(previous_block.getMdText() + "\n" + block.getMdText());
+                        previous_block.getManager().getBlockList().remove(block);
+                    }
+                }
+            }
+        } else {
+            String[] lines = block.getMdText().split("\n");
+        }
+    }
+
     public static boolean isOL(String pre){
         //int blankIdx = line.indexOf(" ");
         //if(blankIdx != -1){
