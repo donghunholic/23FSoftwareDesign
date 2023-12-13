@@ -44,7 +44,7 @@ public class MarkdownEditorProvider implements FileEditorProvider {
      */
     @Override
     public @NotNull @NonNls String getEditorTypeId() {
-        return "WYSIWYG Markdown Editor";
+        return "EASY Markdown Editor";
     }
 
     /**

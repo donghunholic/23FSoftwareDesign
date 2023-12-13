@@ -194,7 +194,7 @@ public class MarkdownEditorImpl implements MarkdownEditor {
      */
     @Override
     public @Nls(capitalization = Nls.Capitalization.Title) @NotNull String getName() {
-        return "WYSIWYG Markdown Editor";
+        return "EASY Markdown Editor";
     }
 
     /**

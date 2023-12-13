@@ -23,7 +23,7 @@ public class Block extends JTextPane {
         this.setEditable(true);
         this.blockManager = manager;
         this.CaretPosition=0;
-        this.setFont(new Font("Jetbrains Mono", Font.PLAIN, 18));
+        this.setFont(new Font("Jetbrains Mono", Font.PLAIN, 15));
 
         this.addMouseListener(new MouseListener() {
             @Override
