@@ -107,7 +107,7 @@ So we used the test coverage supported by IntelliJ.
 
 
 
-# Documentation
+## Documentation
 - [Wiki](https://csed332.postech.ac.kr/md_editor/md_editor/-/wikis/home)
 - [Issue Board](https://csed332.postech.ac.kr/md_editor/md_editor/-/boards)
 
