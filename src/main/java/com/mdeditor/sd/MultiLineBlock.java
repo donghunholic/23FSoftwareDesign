@@ -89,6 +89,7 @@ public class MultiLineBlock extends Block {
                         String pref = Utils.getPrefix(getBlock(), getWhichLine(lines));
                         Pattern regex = Pattern.compile("^[ ]*" + Pattern.quote(pref) + "?[ ]*$");
                         if(regex.matcher(curLine).matches()){
+                            getBlock().setText(String.join("\n", Arrays.copyOfRange(lines, 0, lines.length - 1)));
                             requestManager(BlockEvent.NEW_BLOCK, 0);
                         }
                         else{
