@@ -104,8 +104,8 @@ public class Utils {
                 if (line.charAt(i) == '|') vertical_bar++;
                 else if (line.charAt(i) == '-') hyphen++;
             }
-            if (line.length() == vertical_bar + hyphen) return -vertical_bar + 1;
-            return vertical_bar - 1;
+            if (line.length() == vertical_bar + hyphen) return -vertical_bar;
+            return vertical_bar;
         }
         return 0;
     }
