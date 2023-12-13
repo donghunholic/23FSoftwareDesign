@@ -1,92 +1,118 @@
-# md_editor
+# Intellij Markdown Editor
 
+This project is a **WYSIWYG Markdown Editor plugin** in IntelliJ IDEA.
+
+## Motivation
+Most developers are familiar with the Markdown language and use it to specify programs. In particular, in the case of GitHub and GitLab, Markdown is an essential language as they also provide a preview of the README.md file.
+
+The Markdown editor provided by default in IntelliJ is divided into two tabs. A Markdown tab is created on the left and a Preview tab is created on the right. Because the Preview tab is not editable, the default Markdown editor has the problem that it takes up too much screen space.
+
+There is an IntelliJ Markdown editor plugin to solve this, but it's actual capablility is far behind their demonstration. This is too heavy and takes a very long time to respond when switching tabs. It crashes and sometimes crashes. [See problems](https://csed332.postech.ac.kr/md_editor/md_editor/-/wikis/Miscellaneous/Problems%20of%20Original%20plugin)
+
+We decided to redevelop and refine markdown editor. With our project, user can **view and edit their Markdown documents simultaneously**.
+
+Because the Markdown is rendered at the same time as user modifies, they can see **immediate changes and improve productivity**. Additionally, this plugin may also be useful for those new to Markdown syntax.
+
+
+
+## Features
+- Save / load from file
+  - Save when closing our editor or terminating IntelliJ.
+  - Load when opening our editor.
+- Focused block
+  - Focused block(block where the cursor located) is not rendered. All others parts are rendered as HTML.
+  - Move focused block through click or ↑, ↓ button on keyboard.
+- Add / remove block
+  - Make new block by type enter key at the end of each block.
+  - Remove block by type backspace key at the beginning of each block.
+- Block synchronization
+  - Automatically divided into several blocks when you edit the middle of a multi-line block such as a table or quote.
+  - Automatically combined into one block when you unify consecutive blocks into one format.
+- Cursor position
+  - Maintains the cursor position when some block is clicked.
+  - Maintains the cursor position when focused block is changed with ↑, ↓ buttons.
+- Support types
+  - Raw text
+  - Bold `**bold**`
+  - Italic `*italic*`
+  - Strikethrough `~~strikethrough~~`
+  - Link `[link](link)`
+  - Image `![image](image)`
+  - Inline code ``
+  - Heading `# head`
+  - Quote `>`
+  - Checkbox `- [ ]`
+  - Ordered list `1.`
+  - Unordered list `-`
+  - Codeblock ```
+  - Table `|--|--|`
+
+
+More details on how it works can be found at the following link: [User Scenario](https://csed332.postech.ac.kr/md_editor/md_editor/-/wikis/User-Scenario)
 
 
 ## Getting started
+### Prerequisites
+- [IntelliJ IDEA](https://www.jetbrains.com/ko-kr/idea/)
+- [Java SE 17](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+### Clone
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
-
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+First, clone our project
 
 ```
-cd existing_repo
-git remote add origin https://csed332.postech.ac.kr/md_editor/md_editor.git
-git branch -M main
-git push -uf origin main
+https://csed332.postech.ac.kr/md_editor/md_editor.git
 ```
 
-## Integrate with your tools
+### Run
 
-- [ ] [Set up project integrations](https://csed332.postech.ac.kr/md_editor/md_editor/-/settings/integrations)
+Second, run our project.
 
-## Collaborate with your team
+```
+cd md_editor
+./gradlew runIde
+```
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+### Open our editor
 
-## Test and Deploy
+![howtouse1](./docs/howtouse1.png)
 
-Use the built-in continuous integration in GitLab.
+- When you open a the .md extension, you can see the two tabs below.
+- You can open our editor by clicking tab labeled `WYSIWYG Markdown Editor`.
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+![howtouse2](./docs/howtouse2.png)
 
-***
+- After that, if you click some part, that block's raw markdown text is shown.
+- All other parts appeared to be rendered in HTML.
 
-# Editing this README
+### Test coverage
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thank you to [makeareadme.com](https://www.makeareadme.com/) for this template.
+You can run the test by entering the following command.
 
-## Suggestions for a good README
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+```
+./gradlew test
+```
 
-## Name
-Choose a self-explaining name for your project.
+There was a bug where all coverages showed 0%, when create a coverage report using Jacoco test report.
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+So we used the test coverage supported by IntelliJ.
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+![coverage1](./docs/coverage1.png)
+- Right-click the test package.
+- Click `Run with Coverage`
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+![coverage2](./docs/coverage2.png)
+- Then, IntelliJ make test coverage.
+- You can even extract coverage report.
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+## Team 
+This project is implemented by POSTECH students taking 2023 Fall CSED332 (Software Design Method) class. 
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+- [Hyeli Jeong](@hyelie)
+- [Donghun Shin](@sdh728)
+- [Minsu Sun](@poodding397)
+- [Hyeonsik Ham](@hhs0515)
+- [Hawoo Jung](@howru0321)
+- [Yonghwan Kim](@kyh102824)
