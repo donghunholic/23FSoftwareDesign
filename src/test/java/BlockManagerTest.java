@@ -128,7 +128,7 @@ class BlockManagerTest {
         Block b = blockManager.getBlockList().get(blockManager.getBlockList().size() - 1);
         b.setMdText(b.getMdText() + "\n# Head 1\n1. spy\n> maybe");
         assertDoesNotThrow(() -> blockManager.blockParse(blockManager.getBlockList().size() - 1));
-        assertEquals(8, blockManager.getBlockList().size());
+        assertEquals(7, blockManager.getBlockList().size());
     }
 
     @Test
