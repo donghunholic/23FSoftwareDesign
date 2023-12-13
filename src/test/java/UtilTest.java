@@ -133,6 +133,12 @@ void function(){
     }
 
     @Test
+    void testStringToHtmlWithCss() {
+        String mdText = "# head1";
+        assertNotEquals(Jsoup.parse(Utils.stringToHtmlWithCss(mdText)).head().select("style").size(), 0);
+    }
+
+    @Test
     void testFlexmarkParse(){
         assertEquals("input", Utils.flexmarkParse("input").getChars().toString());
     }
@@ -164,6 +170,43 @@ void function(){
         assertEquals(0, Utils.prefix_check(block));
     }
 
+    @ParameterizedTest(name = "testGetPrefixAtLine_{index}")
+    @CsvSource({
+            "> quote, 0, 1",
+            "- UOL, 0, 1",
+            "+ UOL, 0, 1",
+            "* UOL, 0, 1",
+            "### Head, 0, 0",
+            "12. IOL, 0, 3",
+            "1. IOL, 0, 2",
+            "321. IOL, 0, 4",
+            "a. AOL, 0, 0"
+    })
+    void testGetPrefixAtLine(String mdText, int line, int result) {
+        block.setMdText(mdText);
+        block.renderMD();
+        assertEquals(Utils.getPrefixAtLine(block, line), result);
+    }
+
+    @ParameterizedTest(name = "testGetPrefix_{index}")
+    @CsvSource({
+            "> quote, 0, >",
+            "- UOL, 0, -",
+            "+ UOL, 0, +",
+            "* UOL, 0, *",
+            "### Head, 0, ",
+            "12. IOL, 0, 12.",
+            "1. IOL, 0, 1.",
+            "321. IOL, 0, 321.",
+            "a. AOL, 0,"
+    })
+    void testGetPrefix(String mdText, int line, String result) {
+        block.setMdText(mdText);
+        block.renderMD();
+        result = (result == null) ? "" : result;
+        assertEquals(Utils.getPrefix(block, line), result);
+    }
+
     @Test
     void testTableCheck() {
         String content = """
@@ -186,5 +229,23 @@ void function(){
     })
     void testIsOL(String prefix, boolean result) {
         assertEquals(result, Utils.isOL(prefix));
+    }
+
+    @ParameterizedTest(name = "testIsBlockStringMultiline_{index}")
+    @CsvSource({
+            "> quote, true",
+            "- UOL, true",
+            "+ UOL, true",
+            "* UOL, true",
+            "### Head, false",
+            "12. IOL, true",
+            "1. IOL, true",
+            "321. IOL, true",
+            "a. AOL, false"
+    })
+    void testIsBlockStringMultiline(String mdText, boolean result) {
+        block.setMdText(mdText);
+        block.renderMD();
+        assertEquals(Utils.isBlockStringMultiline(block), result);
     }
 }
