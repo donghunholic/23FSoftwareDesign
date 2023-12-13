@@ -7,10 +7,12 @@ body {
     -fx-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
     text-size-adjust: 100%;
-    font-size: 16px;
-    font-color : white
-    line-height: 1.6;
+    font-size: 10px;
+    font-family: "Jetbarins Mono";
+    color : #d1dae8;
+    line-height: 1.8;
     word-wrap: break-word;
+    margin: 3px, 5px;
 }
 
 a {
@@ -48,8 +50,8 @@ code,
 kbd,
 pre {
     font-family: monospace, monospace;
-    font-size: 1em;
-    color: #333;
+    font-size: 1.2em;
+    background-color: #ff6257;
 }
 
 input {
@@ -130,30 +132,6 @@ h6 {
     line-height: 1.1;
 }
 
-h1 {
-    font-size: 30px;
-}
-
-h2 {
-    font-size: 21px;
-}
-
-h3 {
-    font-size: 16px;
-}
-
-h4 {
-    font-size: 14px;
-}
-
-h5 {
-    font-size: 12px;
-}
-
-h6 {
-    font-size: 11px;
-}
-
 blockquote {
     margin: 0;
 }
@@ -161,8 +139,6 @@ blockquote {
 ul,
 ol {
     padding: 0;
-    margin-top: 0;
-    margin-bottom: 0;
 }
 
 ol ol,
@@ -183,13 +159,13 @@ dd {
 
 code {
     font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
-    font-size: 12px;
+    font-size: 1.2em;
 }
 
 pre {
     margin-top: 0;
     margin-bottom: 0;
-    font: 12px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    font: 1.1em Consolas, "Liberation Mono", Menlo, Courier, monospace;
 }
 
 .octicon {
@@ -239,8 +215,7 @@ h4,
 h5,
 h6 {
     position: relative;
-    margin-top: 1em;
-    margin-bottom: 16px;
+    margin: 8px 0px;
     font-weight: bold;
     line-height: 1.4;
 }
@@ -358,12 +333,11 @@ ul ul,
 ul ol,
 ol ol,
 ol ul {
-    margin-top: 0;
-    margin-bottom: 0;
+
 }
 
 li > p {
-    margin-top: 16px;
+    margin: 0px, 8px;
 }
 
 dl {
@@ -372,7 +346,7 @@ dl {
 
 dl dt {
     padding: 0;
-    margin-top: 16px;
+    margin: 8px, 0px;
     font-size: 1em;
     font-style: italic;
     font-weight: bold;
@@ -385,8 +359,6 @@ dl dd {
 
 blockquote {
     padding: 0 15px;
-    color: #777;
-    border-left: 4px solid #ddd;
 }
 
 blockquote > :first-child {
@@ -428,9 +400,9 @@ code {
     padding: 0;
     padding-top: 0.2em;
     padding-bottom: 0.2em;
-    margin: 0;
-    font-size: 85%;
-    background-color: rgba(0, 0, 0, 0.04);
+    margin: 5;
+    font-size: 1.1em;
+    background-color: #ff6257;
     border-radius: 3px;
 }
 

@@ -84,7 +84,7 @@ public class Utils {
         int end = temp.indexOf(" ", start);
         if (end == -1) return 0;
         String prefix = temp.substring(start, end);
-        if(prefix.equals(">") || prefix.equals("-") || prefix.equals("+")|| prefix.equals("*")) return 1;               //TODO: make regular expression of nested quote.
+        if(prefix.equals(">") || prefix.equals("-") || prefix.equals("+")|| prefix.equals("*") || prefix.equals("|")) return 1;               //TODO: make regular expression of nested quote.
         else if (prefix.endsWith(".")){
             try {
                  Integer.parseInt(prefix.substring(0, prefix.length() - 1));
@@ -102,7 +102,7 @@ public class Utils {
         int end = curLine.indexOf(" ", start);
         if (end == -1) return 0;
         String prefix = curLine.substring(start, end);
-        if(prefix.equals(">") || prefix.equals("-") || prefix.equals("+")|| prefix.equals("*")) return 1;
+        if(prefix.equals(">") || prefix.equals("-") || prefix.equals("+")|| prefix.equals("*") || prefix.equals("|")) return 1;
         else if (prefix.endsWith(".")){
             try {
                 Integer.parseInt(prefix.substring(0, prefix.length() - 1));
@@ -125,7 +125,7 @@ public class Utils {
         int end = curLine.indexOf(" ", start);
         if (end == -1) end = curLine.length();
         String prefix = curLine.substring(start, end);
-        if(prefix.equals(">") || prefix.equals("-") || prefix.equals("+")|| prefix.equals("*")) return prefix;
+        if(prefix.equals(">") || prefix.equals("-") || prefix.equals("+")|| prefix.equals("*") || prefix.equals("|")) return prefix;
         else if (prefix.endsWith(".")){
             try {
                 Integer.parseInt(prefix.substring(0, prefix.length() - 1));
@@ -162,7 +162,7 @@ public class Utils {
         if (end == -1) return false;
 
         String prefix = temp.substring(start, end);
-        if(prefix.equals(">") || prefix.equals("-") || prefix.equals("+")|| prefix.equals("*")) return true;
+        if(prefix.equals(">") || prefix.equals("-") || prefix.equals("+")|| prefix.equals("*") || prefix.equals("|")) return true;
         else if (prefix.endsWith(".")){
             try {
                 Integer.parseInt(prefix.substring(0, prefix.length() - 1));

@@ -5,7 +5,6 @@ import com.vladsch.flexmark.util.ast.Node;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-
 import javax.swing.*;
 import java.util.*;
 
