@@ -8,7 +8,7 @@ body {
     -ms-text-size-adjust: 100%;
     text-size-adjust: 100%;
     font-size: 16px;
-    font-color : white
+    font-color : white;
     line-height: 1.6;
     word-wrap: break-word;
 }
