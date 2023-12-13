@@ -3,6 +3,7 @@ package com.mdeditor.sd;
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -15,21 +16,14 @@ public class Block extends JTextPane {
 
     private String mdText;
     private BlockManager blockManager;
-
-    public final String indent = "  ";
-    private int indent_level;
-
-    //protected int PreCaretPosition;
     protected int CaretPosition;
 
     public Block(BlockManager manager){
         this.mdText = "";
         this.setEditable(true);
         this.blockManager = manager;
-        this.indent_level = 0;
-        //PreCaretPosition=0;
-        CaretPosition=0;
-
+        this.CaretPosition=0;
+        this.setFont(new Font("Jetbrains Mono", Font.PLAIN, 18));
 
         this.addMouseListener(new MouseListener() {
             @Override
@@ -131,17 +125,14 @@ public class Block extends JTextPane {
         blockManager = null;
     }
 
-    public void setIndent_level(int level){
-        indent_level = level;
-    }
-
-    public int getIndent_level(){
-        return this.indent_level;
-    }
-
+    /**
+     * Function to correct caret difference before and after block's content type change
+     * @param position - primitive caret position (in HTML format)
+     * @return caret position in MD format
+     */
     public int getCaretPosition(int position){
         if (mdText == null || mdText.isEmpty() || position < 0 || position > mdText.length()) {
-            return -1;
+            return 0;
         }
 
 
@@ -180,22 +171,20 @@ public class Block extends JTextPane {
     private int MarkdownHeaderPosition(int position) {
         int prefixLength = getPrefixLength('#');
         if (prefixLength == -1) {
-            return -1;
+            return position;
         }
         prefixLength++;
 
-        int adjustedPosition = (position - 1) + prefixLength;
-        return adjustedPosition;
+        return (position - 1) + prefixLength;
     }
 
     private int MarkdownQuotePosition(int position) {
         int prefixLength = getPrefixLength('>');
         if (prefixLength == -1) {
-            return -1;
+            return position;
         }
 
-        int adjustedPosition = (position - 1) + prefixLength;
-        return adjustedPosition;
+        return (position - 1) + prefixLength;
     }
 
     private int getPrefixLength(char prefix) {
@@ -249,6 +238,48 @@ public class Block extends JTextPane {
                 break;
             }
         }
-        return -1;
+        return position;
+    }
+
+    /**
+     * @return Number of spaces(indent) where the cursor is
+     */
+    public int getIndent() {
+        String[] lines = getMdText().split("\n");
+        return countSpace(lines[getWhichLine(lines)]);
+    }
+
+    /**
+     * Returns the number of space at lineNum
+     * @param lineNum - Line which you want to check indent
+     * @return number of space
+     */
+    public int getIndentAtLine(int lineNum){
+        String[] lines = getMdText().split("\n");
+
+        return countSpace(lines[lineNum]);
+    }
+
+    public int getWhichLine(String[] lines) {
+        int caret = getCaretPosition();
+        int totalChars = 0;
+        for (int i = 0; i < lines.length; i++) {
+            totalChars += lines[i].length() + 1;
+            if (totalChars > caret) {
+                return i;
+            }
+        }
+        return lines.length - 1;
+    }
+
+    private int countSpace(String line) {
+        int cnt = 0;
+        for (char c : line.toCharArray()) {
+            if (c == ' ') {
+                cnt++;
+            }
+            else break;
+        }
+        return cnt;
     }
 }
