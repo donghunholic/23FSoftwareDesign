@@ -75,12 +75,12 @@ cd md_editor
 
 ### Open our editor
 
-![howtouse1](./docs/howtouse1.png)
+> ![howtouse1](./docs/howtouse1.png)
 
 - When you open a the .md extension, you can see the two tabs below.
 - You can open our editor by clicking tab labeled `WYSIWYG Markdown Editor`.
 
-![howtouse2](./docs/howtouse2.png)
+> ![howtouse2](./docs/howtouse2.png)
 
 - After that, if you click some part, that block's raw markdown text is shown.
 - All other parts appeared to be rendered in HTML.
@@ -97,13 +97,19 @@ There was a bug where all coverages showed 0%, when create a coverage report usi
 
 So we used the test coverage supported by IntelliJ.
 
-![coverage1](./docs/coverage1.png)
+> ![coverage1](./docs/coverage1.png)
 - Right-click the test package.
 - Click `Run with Coverage`
 
-![coverage2](./docs/coverage2.png)
+> ![coverage2](./docs/coverage2.png)
 - Then, IntelliJ make test coverage.
 - You can even extract coverage report.
+
+
+
+# Documentation
+- [Wiki](https://csed332.postech.ac.kr/md_editor/md_editor/-/wikis/home)
+- [Issue Board](https://csed332.postech.ac.kr/md_editor/md_editor/-/boards)
 
 
 
