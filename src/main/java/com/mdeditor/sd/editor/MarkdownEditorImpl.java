@@ -3,23 +3,16 @@ package com.mdeditor.sd.editor;
 import com.intellij.openapi.fileEditor.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
-import com.intellij.openapi.util.UserDataHolder;
-import com.intellij.openapi.vfs.newvfs.BulkFileListener;
-import com.intellij.openapi.vfs.newvfs.events.VFileEvent;
 import com.intellij.openapi.vfs.*;
 import com.intellij.ui.components.JBScrollPane;
-import com.mdeditor.sd.Block;
-import com.mdeditor.sd.BlockManager;
-import com.mdeditor.sd.Utils;
+import com.mdeditor.sd.block.Block;
+import com.mdeditor.sd.manager.BlockManager;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.util.LinkedList;
-import java.util.List;
+
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.editor.Document;
@@ -27,17 +20,10 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.project.ProjectManagerListener;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import java.io.IOException;
 
 import javax.swing.*;
 import java.beans.PropertyChangeListener;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Objects;
-
 
 public class MarkdownEditorImpl implements MarkdownEditor {
     // files
@@ -65,7 +51,7 @@ public class MarkdownEditorImpl implements MarkdownEditor {
         project.getMessageBus().connect()
                 .subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, getFileEditorManagerListener());
         project.getMessageBus().connect()
-                .subscribe(FileEditorManagerListener.Before.FILE_EDITOR_MANAGER, getFileEditorManagerListener_Before());
+                .subscribe(FileEditorManagerListener.Before.FILE_EDITOR_MANAGER, getFileEditorManagerListenerBefore());
         project.getMessageBus().connect()
                 .subscribe(ProjectManager.TOPIC, getProjectManagerListener());
     }
@@ -84,12 +70,13 @@ public class MarkdownEditorImpl implements MarkdownEditor {
     private void updateEditor()
     {
         try {
-            String mdFileContent = VfsUtil.loadText(file);
+            String mdFileContent = VfsUtilCore.loadText(file);
             blockManager.setBlocks(mdFileContent);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
+
     //Editor to Markdown
     private void updateMarkdownFile() {
         ApplicationManager.getApplication().runWriteAction(() ->{
@@ -102,6 +89,7 @@ public class MarkdownEditorImpl implements MarkdownEditor {
             }
         });
     }
+
 
     private FileEditorManagerListener getFileEditorManagerListener(){
         return new FileEditorManagerListener() {
@@ -126,7 +114,8 @@ public class MarkdownEditorImpl implements MarkdownEditor {
             }
         };
     }
-    private FileEditorManagerListener.Before getFileEditorManagerListener_Before(){
+
+    private FileEditorManagerListener.Before getFileEditorManagerListenerBefore(){
         return new FileEditorManagerListener.Before() {
             @Override
             public void beforeFileClosed(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
@@ -204,7 +193,7 @@ public class MarkdownEditorImpl implements MarkdownEditor {
      */
     @Override
     public void setState(@NotNull FileEditorState state) {
-
+        // nothing to do here, so left it empty
     }
 
     /**
@@ -232,7 +221,7 @@ public class MarkdownEditorImpl implements MarkdownEditor {
      */
     @Override
     public void addPropertyChangeListener(@NotNull PropertyChangeListener listener) {
-
+        // nothing to do here, so left it empty
     }
 
     /**
@@ -242,7 +231,7 @@ public class MarkdownEditorImpl implements MarkdownEditor {
      */
     @Override
     public void removePropertyChangeListener(@NotNull PropertyChangeListener listener) {
-
+        // nothing to do here, so left it empty
     }
 
     /**
@@ -250,7 +239,7 @@ public class MarkdownEditorImpl implements MarkdownEditor {
      */
     @Override
     public void dispose() {
-        //System.out.println(EditorText.getText());
+        // nothing to do here, so left it empty
     }
 
     /**
@@ -270,7 +259,7 @@ public class MarkdownEditorImpl implements MarkdownEditor {
      */
     @Override
     public <T> void putUserData(@NotNull Key<T> key, @Nullable T value) {
-
+        // nothing to do here, so left it empty
     }
 
     @Override
