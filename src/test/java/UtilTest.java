@@ -1,13 +1,26 @@
+import com.mdeditor.sd.block.Block;
+import com.mdeditor.sd.manager.BlockManager;
 import com.mdeditor.sd.utils.Utils;
 import org.jsoup.Jsoup;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import com.vladsch.flexmark.util.ast.Node;
+import org.mockito.Mock;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class UtilTest {
+    @Mock
+    BlockManager manager;
+    Block block;
+
+    @BeforeEach
+    void clearBlock() {
+        block = new Block(manager);
+    }
+
     @Test
     void testWrapWithHtmlTag() {
         String tag = "p";
@@ -120,6 +133,12 @@ void function(){
     }
 
     @Test
+    void testStringToHtmlWithCss() {
+        String mdText = "# head1";
+        assertNotEquals(0, Jsoup.parse(Utils.stringToHtmlWithCss(mdText)).head().select("style").size());
+    }
+
+    @Test
     void testFlexmarkParse(){
         assertEquals("input", Utils.flexmarkParse("input").getChars().toString());
     }
@@ -128,5 +147,55 @@ void function(){
     void testFlexmarkHtmlRender(){
         Node node = Utils.flexmarkParse("input");
         assertEquals("<p>input</p>", Utils.flexmarkHtmlRender(node).trim());
+    }
+
+    @ParameterizedTest(name = "testGetPrefix_{index}")
+    @CsvSource({
+            "> quote, 0, >",
+            "- UOL, 0, -",
+            "+ UOL, 0, +",
+            "* UOL, 0, *",
+            "### Head, 0, ",
+            "12. IOL, 0, 12.",
+            "1. IOL, 0, 1.",
+            "321. IOL, 0, 321.",
+            "a. AOL, 0,"
+    })
+    void testGetPrefix(String mdText, int line, String result) {
+        block.setMdText(mdText);
+        block.renderMD();
+        result = (result == null) ? "" : result;
+        assertEquals(Utils.getPrefix(block, line), result);
+    }
+
+    @ParameterizedTest(name = "testIsOL_{index}")
+    @CsvSource({
+            ">, false",
+            "-, false",
+            "###, false",
+            "12., true",
+            "1., true",
+            "321., true"
+    })
+    void testIsOL(String prefix, boolean result) {
+        assertEquals(result, Utils.isOL(prefix));
+    }
+
+    @ParameterizedTest(name = "testIsBlockStringMultiline_{index}")
+    @CsvSource({
+            "> quote, true",
+            "- UOL, true",
+            "+ UOL, true",
+            "* UOL, true",
+            "### Head, false",
+            "12. IOL, true",
+            "1. IOL, true",
+            "321. IOL, true",
+            "a. AOL, false"
+    })
+    void testIsBlockStringMultiline(String mdText, boolean result) {
+        block.setMdText(mdText);
+        block.renderMD();
+        assertEquals(Utils.isBlockStringMultiline(block), result);
     }
 }
