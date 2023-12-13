@@ -1,5 +1,6 @@
 import com.mdeditor.sd.BlockEvent;
 import com.mdeditor.sd.BlockManager;
+import com.mdeditor.sd.MultiLine;
 import com.mdeditor.sd.MultiLineBlock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,6 +9,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -142,5 +144,25 @@ public class MultiLineBlockTest {
         assertDoesNotThrow(() -> {
             l.keyReleased(eT);
         });
+    }
+
+    @Test
+    void testKeyEventHandlerExtreme() {
+        block.setMdText("""
+                > quote 1
+                > quote 2
+                > quote 3
+                """);
+        block.renderMD();
+        block.setCaretPosition(block.getMdText().length());
+        assertDoesNotThrow(() -> {
+            l.keyReleased(eE);
+        });
+    }
+
+    @Test
+    void testMultiLineBlockType() {
+        block.setType(MultiLine.OL);
+        assertEquals(block.getType(), MultiLine.OL);
     }
 }
