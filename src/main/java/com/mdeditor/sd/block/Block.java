@@ -162,7 +162,7 @@ public class Block extends JTextPane {
             case '-', '*', '+', '.':
                 return markdownListPosition(position,prefix);
             default:
-                return position;
+                return position - 1;
         }
     }
 
@@ -205,6 +205,7 @@ public class Block extends JTextPane {
         if (prefixLength == -1) {
             return position;
         }
+        prefixLength++;
 
         return (position - 1) + prefixLength;
     }
