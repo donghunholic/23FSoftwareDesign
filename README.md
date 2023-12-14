@@ -1,3 +1,6 @@
+> ![Simple_Description](./docs/Simple_Description.png)
+
+
 # Intellij Markdown Editor
 
 This project is a **Easy Markdown Editor plugin** in IntelliJ IDEA.
