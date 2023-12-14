@@ -1,4 +1,4 @@
-> ![Simple_Description](./docs/Simple_Description.png)
+![Simple_Description](./docs/Simple_Description.png)
 
 
 # Intellij Markdown Editor
