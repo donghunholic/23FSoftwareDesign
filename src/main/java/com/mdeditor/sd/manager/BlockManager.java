@@ -150,7 +150,11 @@ public class BlockManager {
      * @param idx - the integer of Block's index. Must have value between 0 ~ BlockList.length()
      */
     public void blockParse(int idx){
+        if(idx < 0 || idx > blockList.size()){
+            return;
+        }
         int nl_idx = 0;
+        int line_idx = 0;
         Block temp = this.blockList.get(idx);
         String str = temp.getMdText();
         String prefix = "";
@@ -174,7 +178,7 @@ public class BlockManager {
                 if(is_last_line){
                     break;
                 }
-                sliced = str.substring(nl_idx, nl_idx + prefix_len);
+                sliced = Utils.getPrefix(temp, line_idx);//str.substring(nl_idx, nl_idx + prefix_len);
                 if((!sliced.equals(prefix) && !isPrefixOl) || (isPrefixOl && !Utils.isOL(sliced))){
                     newSingleStr = str.substring(nl_idx);
                     if(newSingleStr.endsWith("\n")){
@@ -194,6 +198,7 @@ public class BlockManager {
                     break;
                 }
                 nl_idx = str.indexOf("\n", nl_idx) + 1;
+                line_idx++;
                 if(str.indexOf("\n", nl_idx + 1) == -1){
                     is_last_line = true;
                 }
@@ -322,6 +327,9 @@ public class BlockManager {
      * @param idx block number which we inspect now
      */
     public void mergeBlock(int idx){
+        if(idx < 0 || idx > blockList.size()){
+            return;
+        }
         int curIdx = idx;
         Block cur;
         Block up;
