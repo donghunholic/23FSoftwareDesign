@@ -123,12 +123,12 @@ class BlockTest {
     @ParameterizedTest(name = "testGerCaretPosition_{index}")
     @CsvSource({
             "## Head 2, 2, 4",
-            "> Quote-quote, 8, 8",
+            "> Quote-quote, 8, 9",
             "- UOL - UOL, 3, 4",
             "* UOL * UOL * UOL, 15, 16",
             " + UOL + UOL, 10, 11",
             "1. OL 2. OL, 5, 7",
-            "a. alphaOL, 2, 2"
+            "a. alphaOL, 2, 1"
     })
     void testGetCaretPositionParam(String md, int position, int answer) {
         block.setMdText(md);
@@ -139,12 +139,12 @@ class BlockTest {
     @ParameterizedTest(name = "testGerCaretPosition_{index}")
     @CsvSource({
             "## Head 2, 2, 2",
-            "> Quote-quote, 8, 7",
+            "> Quote-quote, 8, 8",
             "- UOL - UOL, 3, 12",
             "* UOL * UOL * UOL, 15, 22",
             " + UOL + UOL, 10, 19",
             "1. OL 2. OL, 5, 15",
-            "a. alphaOL, 2, 2"
+            "a. alphaOL, 2, 1"
     })
     void testGetCaretPositionParamWithSpace(String md, int position, int answer) {
         md = "  ".repeat(md.length() % 7) + md;
