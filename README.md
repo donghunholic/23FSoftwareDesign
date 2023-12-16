@@ -125,3 +125,13 @@ This project is implemented by POSTECH students taking 2023 Fall CSED332 (Softwa
 - [Hyeonsik Ham](@hhs0515)
 - [Hawoo Jung](@howru0321)
 - [Yonghwan Kim](@kyh102824)
+
+## How to contribute
+1. Fork this repository on [link](https://csed332.postech.ac.kr/md_editor/md_editor/-/forks/new)
+2. Create a new branch using command `git checkout -b feature/featureName`.
+3. Commit using command `git commit -am 'Add some feature'`.
+4. Push to branch using command `git push origin feature/featureName`.
+5. Send a pull request.
+
+## License
+md_editor is available under the BSD-2 Clause license. See the License file for more info.
